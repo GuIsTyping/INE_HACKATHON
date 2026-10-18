@@ -47,6 +47,7 @@ Participar en el **Reto 1: Perfiles ciudadanos de participacion** (Eje: Segmenta
 ```
 INE_HACKATHON/
   pyproject.toml              Entorno UV (dependencias reproducibles)
+  .python-version             Version de Python fijada (3.12)
   src/
     descarga_inicial.py       Script standalone de descarga y extraccion
   notebooks/
@@ -140,7 +141,7 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 ## Entorno
 
 - **Gestor:** UV (reproducible con `uv sync`)
-- **Python:** 3.12
+- **Python:** 3.12 (fijado en `.python-version`; `uv sync` lo respeta aunque haya otras versiones instaladas)
 - **Dependencias:** pandas, numpy, matplotlib, seaborn, scikit-learn, jupyter, requests, tqdm, pyarrow
 
 ## Variables Sugeridas para Segmentacion
