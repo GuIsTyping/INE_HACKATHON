@@ -43,7 +43,8 @@ Ejecuta las celdas en orden. Ademas de descargar y extraer, consolida los CSVs e
 |---|---|---|
 | 1 | `notebooks/01_ingesta_datos.ipynb` | Descarga ZIPs, extrae CSVs, consolida a Parquet |
 | 2 | `notebooks/02_perfilado_datos.ipynb` | Perfilado de calidad, cobertura y participacion |
-| 3 | (pendiente) | Segmentacion / clustering |
+| 3 | `notebooks/03_analisis_exploratorio.ipynb` | Historial por seccion y celda; genera tablas para segmentacion |
+| 4 | (pendiente) | Segmentacion / clustering |
 
 ## Estructura de carpetas
 
@@ -56,6 +57,7 @@ INE_HACKATHON/
   notebooks/
     01_ingesta_datos.ipynb  Ingesta completa (descarga + consolidacion)
     02_perfilado_datos.ipynb  Perfilado de datos
+    03_analisis_exploratorio.ipynb  Analisis exploratorio
   DATA/
     RAW/ZIPS/               ZIPs descargados
     RAW/<dataset>/          CSVs extraidos por dataset
@@ -71,6 +73,8 @@ INE_HACKATHON/
 | `conteos_pj2025.parquet` | Eleccion Poder Judicial 2025 | 9,835,254 |
 | `voto_anticipado_2024.parquet` | Voto anticipado 2024 | 3,449 |
 | `prision_preventiva_2024.parquet` | Voto en prision preventiva 2024 | 26,563 |
+| `secciones_historial.parquet` | Historial e indicadores por seccion (notebook 03) | 54,892 |
+| `celdas_historial.parquet` | Historial e indicadores por seccion x sexo x grupo de edad (notebook 03) | 657,497 |
 
 ## Documentacion
 
