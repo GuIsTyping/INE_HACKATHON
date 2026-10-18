@@ -1,0 +1,22 @@
+# Datos pesados (descargar con src/descarga_inicial.py o notebook)
+DATA/RAW/ZIPS/
+DATA/RAW/conteos*/
+DATA/RAW/voto_anticipado_2024/
+DATA/RAW/prision_preventiva_2024/
+DATA/PREPROCESSED/
+
+# PDFs descargados (se regeneran con el script)
+DATA/DOCS/*.pdf
+
+# Entorno virtual
+.venv/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# UV lock (reproducible con uv sync)
+# uv.lock
