@@ -1,5 +1,16 @@
 # Bitacora de Cambios
 
+## 2026-10-18
+
+### Version de Python fijada
+- `.python-version` con 3.12 (`uv python pin 3.12`) para que todo el equipo use la misma version; antes `uv sync` tomaba la primera disponible (>=3.12)
+
+### Fix en notebook de ingesta
+- `01_ingesta_datos.ipynb` (seccion 11): `pf.schema_arrow.num_fields` -> `len(pf.schema_arrow)`; `num_fields` no existe en pyarrow 26 y detenia la ejecucion antes de guardar PJ 2025 y extras
+
+### Configuracion de VS Code
+- `.vscode/` agregado a `.gitignore`: la configuracion del editor es local de cada integrante y no se versiona
+
 ## 2026-10-17
 
 ### Estructura inicial del repositorio

@@ -18,5 +18,9 @@ DATA/DOCS/*.pdf
 __pycache__/
 *.pyc
 
+
+# vscode settings
+.vscode/
+
 # UV lock (reproducible con uv sync)
 # uv.lock
