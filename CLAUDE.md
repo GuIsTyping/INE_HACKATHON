@@ -58,7 +58,6 @@ notebooks/              Jupyter notebooks (numerados por orden de ejecucion)
 
 La ingesta de datos esta completa. Los siguientes pasos pendientes son:
 
-- Perfilado de datos
 - Analisis exploratorio
 - Idear 5 maneras innovadoras de abordar el problema
 - Diseno de metodologia de segmentacion / clustering
