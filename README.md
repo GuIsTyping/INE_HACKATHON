@@ -10,7 +10,7 @@ Reto 1: Segmentacion sociodemografica de la participacion ciudadana a partir de 
 ## Instalacion
 
 ```bash
-git clone <url-del-repo>
+git clone https://github.com/GuIsTyping/INE_HACKATHON.git
 cd INE_HACKATHON
 uv sync
 ```
