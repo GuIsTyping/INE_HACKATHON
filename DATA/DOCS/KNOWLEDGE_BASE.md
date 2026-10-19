@@ -53,6 +53,7 @@ INE_HACKATHON/
   notebooks/
     01_ingesta_datos.ipynb    Descarga, extraccion y consolidacion
     02_perfilado_datos.ipynb  Calidad, cobertura y participacion por variable
+    03_analisis_exploratorio.ipynb  Historial por seccion y celda, cohortes, regiones, PJ 2025
   DATA/
     RAW/
       ZIPS/                   ZIPs descargados del INE
@@ -70,6 +71,8 @@ INE_HACKATHON/
       conteos_pj2025.parquet              9,835,254 filas (76 MB)
       voto_anticipado_2024.parquet        3,449 filas
       prision_preventiva_2024.parquet     26,563 filas
+      secciones_historial.parquet         54,892 filas (generado en 03)
+      celdas_historial.parquet            657,497 filas (generado en 03)
     DOCS/
       KNOWLEDGE_BASE.md       Este archivo
       CHANGELOG.md            Bitacora de cambios
@@ -144,7 +147,11 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 ### Calidad
 - Sin nulos en ningun dataset. `LN = SV + NV + NS` en el 100% de registros (federal y PJ 2025); ningun registro con LN = 0.
 - % NS sobre LN por ano: 2009 2.4, 2012 0.2, 2015 6.1, 2018 6.8, 2021 4.3, 2024 6.4. Por eso la participacion se calcula sobre SV + NV.
-- EDAD va de 18 a 140. EDAD > 100: 94,090 personas en LN (participacion ~10%), probablemente registros desactualizados.
+- EDAD va de 18 a 140. Los valores altos NO son codigos: el diccionario de los ZIPs no define valores especiales, el manual CCPC trata EDAD como edad real (su ultimo grupo quinquenal es "100+") y la distribucion decrece suave sin picos.
+  - Los registros envejecen entre elecciones (misma seccion y sexo, edad + 3 anos): 2021->2024 permanece 48% del grupo 90-99, 23% de 100-109 y 21% de 110+.
+  - 90-99: 2.2M personas en LN acumulada, participacion 26% (real). 100-109: 127 mil, participacion 11% (centenarios reales mas fallecidos no dados de baja). 110+: 4,319, participacion 12-27% (biologicamente imposible en esa cantidad; con votos registrados, lo que apunta a fechas de nacimiento mal capturadas).
+  - 2009 tiene muchos mas centenarios que los demas anos (100 anos: 8,573 vs 3,864 en 2012); compatible con una depuracion posterior del padron (no confirmado en documentos).
+  - Impacto minimo: 100+ es 0.02% de la LN acumulada y 110+ es 0.001%. Se agrupan en 80+; excluir EDAD > 110 es opcional.
 - SEXO = 2 solo en 2024 con 105 personas.
 - Nombres de entidad distintos entre datasets (ej. `VERACRUZ` vs `VERACRUZ DE IGNACIO DE LA LLAVE`): unir por clave.
 - Voto anticipado y prision preventiva son un registro por voto (sin edad ni seccion). En prision preventiva la clave de entidad es `ESTADO`.
@@ -169,6 +176,37 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 
 ### Grupos de edad usados
 18-24, 25-29, 30-39, 40-49, 50-59, 60-69, 70-79, 80+
+
+## Hallazgos del Analisis Exploratorio (`03_analisis_exploratorio.ipynb`)
+
+### Tablas para segmentacion
+| Archivo | Unidad | Filas | Columnas clave |
+|---|---|---|---|
+| `secciones_historial.parquet` | EDOCVE + SECCION | 54,892 | P2009..P2024, promedio, desviacion, brecha_pres, tendencia, TIPOSEC, LN2024, REGION, P_PJ2025 |
+| `celdas_historial.parquet` | EDOCVE + SECCION + SEXO + GRUPO_EDAD | 657,497 | P2009..P2024, promedio, desviacion, brecha_pres, tendencia, TIPOSEC, REGION |
+
+- Indicadores: `promedio` (nivel), `desviacion` (estabilidad), `brecha_pres` (promedio 2012/2018/2024 - promedio 2009/2015/2021), `tendencia` (pendiente en puntos por eleccion).
+- Secciones: solo las que tienen tasa valida en las 6 elecciones (cubren 80M de 98M de LN 2024). 9,438 seccion-ano tienen todo el padron en NS.
+- Celdas: 6 elecciones y al menos 20 votantes potenciales (SV + NV) en cada una. La celda no sigue a las mismas personas.
+
+### Regiones (por EDOCVE)
+| Region | EDOCVE |
+|---|---|
+| Noroeste | 2, 3, 8, 10, 25, 26 |
+| Noreste | 5, 19, 28 |
+| Occidente | 1, 6, 11, 14, 16, 18, 32 |
+| Centro | 9, 13, 15, 17, 21, 22, 24, 29 |
+| Sur-Sureste | 4, 7, 12, 20, 23, 27, 30, 31 |
+
+### Hallazgos
+- Noroeste es la region con menor participacion en todos los anos (51.0 en 2024). Centro y Sur-Sureste son las mas altas y las de mayor brecha presidencial.
+- Efecto de primera eleccion: la cohorte 2000s tuvo 64.8 en 2018 y 46.8 en 2021. Las cohortes 1940s-1960s son las mas participativas.
+- Persistencia alta entre elecciones del mismo tipo (correlacion 0.66-0.82 a nivel seccion).
+- Brecha presidencial: mediana +13 puntos; urbano 15.3, rural 8.5. Tendencia: mediana +2.1 puntos por eleccion.
+- `desviacion`, `brecha_pres` y `tendencia` estan correlacionadas (0.58-0.75) y casi no con `promedio`.
+- PJ 2025 vs federal promedio: correlacion 0.28 (dimension distinta).
+- Eta cuadrada del promedio por celda: seccion 41%, grupo de edad 39%, entidad 12%, region 7%, sexo 6%, tipo de seccion 1%.
+- Mujeres participan mas que hombres hasta 60-69; desde 70-79 se invierte.
 
 ## Entorno
 
@@ -199,6 +237,10 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 |---|---|
 | **1. Datos Generales** | Resumen estadistico: LN, SV, NV, %Participacion, %Abstension, IML, IMV |
 | **2. Datos Sociodemograficos** | Participacion por ano, grupo quinquenal, etapa de vida, mapa geografico |
+
+**Agrupaciones de edad oficiales del CCPC (manual, pag. 12):**
+- Etapa de vida: Juventud 18-24, Adulta Joven 25-34, Adulta 35-44, Adulta Plena 45-59, Adulta Mayor 60+.
+- Grupo quinquenal: 18-19, 20-24, 25-29, ..., 95-99, 100+.
 | **3. Datos Comparativos** | Comparacion entre estados, anos, tipo seccion, cuartiles |
 | **4. Voto Anticipado 2024** | Proporcion H/M, votacion por estado |
 | **5. Voto en Prision Preventiva 2024** | Comportamiento votacion, proporcion H/M, mapa |
@@ -222,7 +264,7 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 - [x] Notebook de ingesta de datos
 - [x] Consolidacion de datos a Parquet (54.8M filas federales + 9.8M PJ + extras)
 - [x] Perfilado de datos
-- [ ] Analisis exploratorio
+- [x] Analisis exploratorio
 - [ ] Diseno de metodologia de segmentacion
 - [ ] Implementacion de clustering
 - [ ] Caracterizacion de perfiles

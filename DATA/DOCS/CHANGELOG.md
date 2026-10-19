@@ -2,6 +2,15 @@
 
 ## 2026-10-18
 
+### Revision de edades mayores a 100
+- Verificado que EDAD > 100 no es un codigo especial (diccionarios, manual CCPC y seguimiento de registros entre elecciones). Detalle en `KNOWLEDGE_BASE.md` (Hallazgos del Perfilado > Calidad)
+- Agregadas a `KNOWLEDGE_BASE.md` las agrupaciones de edad oficiales del CCPC (etapa de vida y grupo quinquenal)
+
+### Notebook de analisis exploratorio
+- `notebooks/03_analisis_exploratorio.ipynb` (34 secciones): regiones, cohortes generacionales, historial por seccion y por celda (seccion x sexo x grupo de edad), indicadores de historial, persistencia, relacion con PJ 2025 y fuentes de variacion (eta cuadrada)
+- Genera `secciones_historial.parquet` y `celdas_historial.parquet` en `DATA/PREPROCESSED/`
+- Hallazgos agregados a `KNOWLEDGE_BASE.md`
+
 ### Notebook de perfilado
 - `notebooks/02_perfilado_datos.ipynb` (35 secciones): inventario, esquema, carga con tipos compactos (~1.2 GB en memoria), nulos, cobertura, distribucion de edad, edades atipicas, consistencia LN = SV + NV + NS, NS por ano, participacion por ano, sexo, grupo de edad, tipo de seccion y entidad, secciones con historial completo, PJ 2025 y datasets complementarios
 - Hallazgos agregados a `KNOWLEDGE_BASE.md`
