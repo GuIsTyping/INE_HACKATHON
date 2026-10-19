@@ -52,6 +52,7 @@ INE_HACKATHON/
     descarga_inicial.py       Script standalone de descarga y extraccion
   notebooks/
     01_ingesta_datos.ipynb    Descarga, extraccion y consolidacion
+    02_perfilado_datos.ipynb  Calidad, cobertura y participacion por variable
   DATA/
     RAW/
       ZIPS/                   ZIPs descargados del INE
@@ -138,6 +139,37 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 | `voto_anticipado_2024.parquet` | 3,449 | <0.1 MB |
 | `prision_preventiva_2024.parquet` | 26,563 | <0.1 MB |
 
+## Hallazgos del Perfilado (`02_perfilado_datos.ipynb`)
+
+### Calidad
+- Sin nulos en ningun dataset. `LN = SV + NV + NS` en el 100% de registros (federal y PJ 2025); ningun registro con LN = 0.
+- % NS sobre LN por ano: 2009 2.4, 2012 0.2, 2015 6.1, 2018 6.8, 2021 4.3, 2024 6.4. Por eso la participacion se calcula sobre SV + NV.
+- EDAD va de 18 a 140. EDAD > 100: 94,090 personas en LN (participacion ~10%), probablemente registros desactualizados.
+- SEXO = 2 solo en 2024 con 105 personas.
+- Nombres de entidad distintos entre datasets (ej. `VERACRUZ` vs `VERACRUZ DE IGNACIO DE LA LLAVE`): unir por clave.
+- Voto anticipado y prision preventiva son un registro por voto (sin edad ni seccion). En prision preventiva la clave de entidad es `ESTADO`.
+
+### Cobertura
+- 32 entidades en todos los anos federales (PJ 2025: 31). Municipios 2,455-2,477; secciones 64,934 (2009) a 70,751 (2024).
+- 72,681 secciones distintas (EDOCVE + SECCION); 62,048 (85%) presentes en las 6 elecciones federales.
+
+### Participacion (SV / (SV + NV))
+| Ano | 2009 | 2012 | 2015 | 2018 | 2021 | 2024 |
+|---|---|---|---|---|---|---|
+| Nacional | 44.1 | 62.1 | 47.1 | 62.4 | 51.8 | 59.7 |
+| Hombre | 40.5 | 57.8 | 43.0 | 58.1 | 47.8 | 54.8 |
+| Mujer | 47.4 | 66.1 | 50.9 | 66.3 | 55.6 | 64.2 |
+
+- Presidenciales (2012, 2018, 2024) ~60-62%; intermedias 44-52%.
+- Edad: minimo en 25-29, maximo en 60-79, cae en 80+.
+- Rural > urbano en intermedias (2021: 58.4 vs 50.1); casi igual en presidenciales.
+- 2024 por entidad: maximo Yucatan 71.5, minimo Baja California 47.1; norte por debajo del promedio.
+- PJ 2025: 13.0% de participacion, mismo gradiente por edad (7.8% en 25-29, 22.1% en 70-79).
+- Voto anticipado 2024: 3,449 votos, 62% mujeres. Prision preventiva 2024: 26,563 votos, 91% hombres.
+
+### Grupos de edad usados
+18-24, 25-29, 30-39, 40-49, 50-59, 60-69, 70-79, 80+
+
 ## Entorno
 
 - **Gestor:** UV (reproducible con `uv sync`)
@@ -189,7 +221,7 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 - [x] Configuracion de entorno UV (Python 3.12 + dependencias)
 - [x] Notebook de ingesta de datos
 - [x] Consolidacion de datos a Parquet (54.8M filas federales + 9.8M PJ + extras)
-- [ ] Perfilado de datos
+- [x] Perfilado de datos
 - [ ] Analisis exploratorio
 - [ ] Diseno de metodologia de segmentacion
 - [ ] Implementacion de clustering

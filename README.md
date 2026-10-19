@@ -42,7 +42,7 @@ Ejecuta las celdas en orden. Ademas de descargar y extraer, consolida los CSVs e
 | Paso | Archivo | Que hace |
 |---|---|---|
 | 1 | `notebooks/01_ingesta_datos.ipynb` | Descarga ZIPs, extrae CSVs, consolida a Parquet |
-| 2 | (pendiente) | Perfilado de datos y analisis exploratorio |
+| 2 | `notebooks/02_perfilado_datos.ipynb` | Perfilado de calidad, cobertura y participacion |
 | 3 | (pendiente) | Segmentacion / clustering |
 
 ## Estructura de carpetas
@@ -55,6 +55,7 @@ INE_HACKATHON/
     descarga_inicial.py     Script de descarga y extraccion
   notebooks/
     01_ingesta_datos.ipynb  Ingesta completa (descarga + consolidacion)
+    02_perfilado_datos.ipynb  Perfilado de datos
   DATA/
     RAW/ZIPS/               ZIPs descargados
     RAW/<dataset>/          CSVs extraidos por dataset
