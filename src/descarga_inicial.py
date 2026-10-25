@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DIR_ZIPS = ROOT / "DATA" / "RAW" / "ZIPS"
 DIR_RAW = ROOT / "DATA" / "RAW"
 DIR_DOCS = ROOT / "DATA" / "DOCS"
+DIR_GEO = ROOT / "DATA" / "RAW" / "marco_geoestadistico"
 
 # ---------------------------------------------------------------------------
 # 2. Directorios
@@ -48,6 +49,7 @@ SUBDIRS_RAW = [
 def crear_directorios():
     DIR_ZIPS.mkdir(parents=True, exist_ok=True)
     DIR_DOCS.mkdir(parents=True, exist_ok=True)
+    DIR_GEO.mkdir(parents=True, exist_ok=True)
     (ROOT / "DATA" / "PREPROCESSED").mkdir(parents=True, exist_ok=True)
     for d in SUBDIRS_RAW:
         (DIR_RAW / d).mkdir(parents=True, exist_ok=True)
@@ -77,6 +79,14 @@ DOCUMENTOS = {
     "Carta_declaratoria_decir_verdad.pdf": "https://ine.mx/wp-content/uploads/2026/09/Carta-declaratoria-de-decir-la-verdad_Hackaton.pdf",
     "Carta_cesion_derechos.pdf": "https://ine.mx/wp-content/uploads/2026/09/Carta-de-cesion-de-derechos_Hackaton-1.pdf",
     "Manual_Conteos_Censales_2009_2024.pdf": "https://ine.mx/wp-content/uploads/2025/06/Manual-Conteos-Censales-2009-2024.pdf",
+}
+
+# ---------------------------------------------------------------------------
+# 4b. URLs de geometrias (Shapefiles)
+# ---------------------------------------------------------------------------
+
+GEOMETRIAS = {
+    "mun22gw.zip": "http://www.conabio.gob.mx/informacion/gis/maps/geo/mun22gw.zip",
 }
 
 # ---------------------------------------------------------------------------
@@ -126,10 +136,20 @@ def main():
     for nombre_local, url in DOCUMENTOS.items():
         descargar(url, DIR_DOCS / nombre_local)
 
+    print("\n=== Descargando geometrias (Shapefiles) ===")
+    for nombre_local, url in GEOMETRIAS.items():
+        descargar(url, DIR_GEO / nombre_local)
+
     print("\n=== Extrayendo ZIPs ===")
     for nombre, url in DATASETS.items():
         archivo = url.split("/")[-1]
         extraer_zip(DIR_ZIPS / archivo, DIR_RAW / nombre)
+
+    print("\n=== Extrayendo geometrias ===")
+    for nombre_local in GEOMETRIAS:
+        zip_path = DIR_GEO / nombre_local
+        if zip_path.exists():
+            extraer_zip(zip_path, DIR_GEO)
 
     print("\n=== Inventario ===")
     for nombre in DATASETS:

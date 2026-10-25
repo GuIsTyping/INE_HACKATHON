@@ -1,5 +1,32 @@
 # Bitacora de Cambios
 
+## 2026-10-24
+
+### Nombres auto-generados y layout del mapa
+- `generar_nombre_perfil()`: funcion que compone nombres descriptivos a partir de condiciones sobre edad, genero, tipo de asentamiento y comportamiento electoral (sin nombres hardcodeados)
+- Panel lateral del mapa movido de derecha a izquierda para no solaparse con el LayerControl
+- `.env` con API key de CARTO para tiles del mapa; `.env.example` con instrucciones para obtener la propia
+- `.gitignore` actualizado para excluir `.env`
+- Dependencia `python-dotenv` agregada a `pyproject.toml`
+
+### Segmentacion nacional y mapa interactivo
+- `notebooks/04_segmentacion.ipynb` (27 code, 27 markdown): segmentacion nacional + fichas de perfil + mapa nacional interactivo
+- Clustering nacional ponderado por lista nominal 2024 (71.2M personas, 657k celdas)
+- K-Means con sample_weight, k=4 (rango 4-6 alineado a convocatoria que pide 4-6 perfiles)
+- Caracterizacion completa por perfil: trayectoria 2009-2024, edad, sexo, region, urbano/rural, PJ 2025
+- Nombres descriptivos auto-generados para cada perfil
+- Fichas de perfil (seccion 5.7): una figura consolidada por perfil con trayectoria vs nacional, metricas, edad, region, top 5 entidades
+- Mapa nacional interactivo con tiles CARTO CDN (sin API key), 2 capas + LayerControl
+  - Capa estatal: 32 entidades, popup con nombre de perfil y porcentaje
+  - Capa municipal: 2,475 municipios (1,858 con clustering local, 518 bloqueados)
+  - Popups compactos con nombre de perfil + clustering local con detalle demografico
+  - Panel lateral desplegable con fichas detalladas de los 4 perfiles nacionales
+- Genera `celdas_perfiladas.parquet`, `resumen_perfiles.csv`, `resumen_municipios.csv`, `mapa_nacional_segmentacion.html` (~24 MB)
+- Descarga de shapefile CONABIO en `src/descarga_inicial.py`, dependencias `geopandas` y `folium` en `pyproject.toml`
+
+### Limpieza de ramas
+- Eliminadas 3 ramas remotas ya mergeadas: `fix/entorno-python-312`, `feat/perfilado-datos`, `feat/analisis-exploratorio`
+
 ## 2026-10-18
 
 ### Revision de edades mayores a 100

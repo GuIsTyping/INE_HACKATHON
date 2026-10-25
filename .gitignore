@@ -8,6 +8,9 @@ DATA/PREPROCESSED/
 # PDFs descargados (se regeneran con el script)
 DATA/DOCS/*.pdf
 
+# Variables de entorno (API keys, secretos)
+.env
+
 # Entorno virtual
 .venv/
 

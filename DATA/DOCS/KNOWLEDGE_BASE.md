@@ -54,6 +54,7 @@ INE_HACKATHON/
     01_ingesta_datos.ipynb    Descarga, extraccion y consolidacion
     02_perfilado_datos.ipynb  Calidad, cobertura y participacion por variable
     03_analisis_exploratorio.ipynb  Historial por seccion y celda, cohortes, regiones, PJ 2025
+    04_segmentacion.ipynb         Clustering nacional ponderado + mapa nacional interactivo
   DATA/
     RAW/
       ZIPS/                   ZIPs descargados del INE
@@ -66,6 +67,7 @@ INE_HACKATHON/
       conteosPJ2025/          31 CSVs (sin entidad 32)
       voto_anticipado_2024/   1 CSV
       prision_preventiva_2024/ 1 CSV
+      marco_geoestadistico/  Shapefile CONABIO municipios 2022 (mun22gw.*)
     PREPROCESSED/
       conteos_federal_2009_2024.parquet   54,872,712 filas (184 MB)
       conteos_pj2025.parquet              9,835,254 filas (76 MB)
@@ -208,11 +210,65 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 - Eta cuadrada del promedio por celda: seccion 41%, grupo de edad 39%, entidad 12%, region 7%, sexo 6%, tipo de seccion 1%.
 - Mujeres participan mas que hombres hasta 60-69; desde 70-79 se invierte.
 
+## Segmentacion nacional y mapa interactivo (`04_segmentacion.ipynb`)
+
+### Enfoque
+
+Clustering conductual ponderado por lista nominal: los perfiles emergen del
+comportamiento electoral (promedio, brecha_pres, tendencia), no de la demografia.
+K-Means con sample_weight = SV+NV de 2024 (71.2M personas).
+Caracterizacion post-clustering por edad, sexo, region, tipo de seccion y PJ 2025.
+
+### Perfiles nacionales (k=4)
+
+| Perfil | Personas | % | Prom | Brecha | Tend | %Mujer | PJ2025 | Descripcion |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 19.9M | 28% | 42.8 | +16.9 | +1.6 | 37% | 12.1 | Jovenes (18-29), mayoria hombres, urbanos, baja participacion (sensibles a presidenciales) |
+| 1 | 13.5M | 19% | 49.5 | +5.7 | -1.8 | 41% | 10.3 | Adultos (30-49), semi-rurales, participacion moderada (estables entre elecciones, en descenso) |
+| 2 | 17.8M | 25% | 59.6 | +20.9 | +4.5 | 65% | 15.1 | Edad diversa, mayoria mujeres, urbanos, participacion media-alta (sensibles a presidenciales, en ascenso) |
+| 3 | 19.9M | 28% | 69.3 | +8.6 | +1.2 | 64% | 14.1 | Adultos maduros (50+), mayoria mujeres, semi-rurales, alta participacion |
+
+### Datos geograficos
+
+Shapefile de division politica municipal 2022, fuente CONABIO/INEGI (coordenadas geograficas EPSG:4326).
+Descargado de `http://www.conabio.gob.mx/informacion/gis/maps/geo/mun22gw.zip`, almacenado en `DATA/RAW/marco_geoestadistico/`.
+Descarga integrada en `src/descarga_inicial.py`.
+
+### Fichas de perfil (seccion 5.7)
+
+Una figura matplotlib por perfil que consolida: trayectoria 2009-2024 (vs promedio nacional gris),
+panel de metricas (promedio, brecha, tendencia, genero, tipo de seccion, PJ 2025),
+distribucion de edad (vs nacional), distribucion regional (vs nacional) y top 5 entidades.
+Los datos del CCPC no incluyen escolaridad, ingreso ni autoadscripcion indigena/afromexicana.
+
+### Mapa nacional interactivo
+
+Tiles CARTO CDN (light_all). Dos capas con folium LayerControl (esquina superior derecha):
+1. **Estatal:** 32 entidades, perfil dominante con popup de distribucion (nombre + porcentaje).
+2. **Municipal:** 2,475 municipios (1,858 con clustering local, 518 bloqueados por muestra <30 celdas).
+   Popup con distribucion de perfiles + clustering local con detalle demografico (sexo, edad).
+
+Panel lateral izquierdo desplegable con fichas de los 4 perfiles nacionales (nombre auto-generado, stats, genero, edad, tipo de seccion).
+
+Los nombres de perfil se generan automaticamente con `generar_nombre_perfil()` a partir de condiciones
+sobre la distribucion de edad, genero y tipo de asentamiento del cluster, combinadas con el nivel de
+participacion, brecha y tendencia. No hay nombres hardcodeados.
+Geometrias simplificadas (tolerancia 0.008 municipal, 0.01 estatal). HTML ~24 MB.
+
+### Archivos generados
+
+| Archivo | Contenido |
+|---|---|
+| `celdas_perfiladas.parquet` | 657,497 celdas nacionales con perfil y peso |
+| `resumen_perfiles.csv` | 4 perfiles con estadisticas ponderadas y nombre descriptivo |
+| `resumen_municipios.csv` | 1,858 municipios con k local y perfil dominante |
+| `mapa_nacional_segmentacion.html` | Mapa interactivo folium con 2 capas y panel (~24 MB) |
+
 ## Entorno
 
 - **Gestor:** UV (reproducible con `uv sync`)
 - **Python:** 3.12 (fijado en `.python-version`; `uv sync` lo respeta aunque haya otras versiones instaladas)
-- **Dependencias:** pandas, numpy, matplotlib, seaborn, scikit-learn, jupyter, requests, tqdm, pyarrow
+- **Dependencias:** pandas, numpy, matplotlib, seaborn, scikit-learn, jupyter, requests, tqdm, pyarrow, geopandas, folium
 
 ## Variables Sugeridas para Segmentacion
 
@@ -265,9 +321,8 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 - [x] Consolidacion de datos a Parquet (54.8M filas federales + 9.8M PJ + extras)
 - [x] Perfilado de datos
 - [x] Analisis exploratorio
-- [ ] Diseno de metodologia de segmentacion
-- [ ] Implementacion de clustering
-- [ ] Caracterizacion de perfiles
+- [x] Segmentacion nacional ponderada (k=4, 71.2M personas) con caracterizacion completa
+- [x] Mapa nacional interactivo con 2 capas (estatal + municipal) y clustering local en 1,858 municipios
 - [ ] Propuesta de estrategias
 - [ ] Documento tecnico
 - [ ] Fichas de perfil
