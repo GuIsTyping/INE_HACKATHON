@@ -2,6 +2,26 @@
 
 ## 2026-10-25
 
+### Nombres definitivos de los perfiles
+- `11_fichas_y_mapa.ipynb`: `NOMBRES` fijados (Por convencer, Constancia que se apaga, Generación en ascenso, Paso firme, Voces que avanzan, Pilar democrático); los nombres automaticos pasan a `DESCRIPTORES` y se muestran como subtitulo en fichas, panel del mapa y `fichas_resumen_perfiles.csv`. Reejecutado
+
+### Internet en la vivienda y conclusiones de las pruebas del censo
+- `10_escolaridad_eceg.ipynb`: agregado % de viviendas con internet por seccion (`VPH_INTER / VIVPARH_CV`) a `secciones_eceg_2020.parquet` y a los CSV `escolaridad_*`
+- `11_fichas_y_mapa.ipynb`: internet en el resumen, en el bloque "Contexto de la seccion" del panel de cada ficha, en popups y panel del mapa y en `fichas_municipios.csv`. Reejecutados 10 y 11: perfiles sin cambios
+- Pruebas locales (no versionadas) de segmentacion con marginacion, economia, indigena, afromexicana y barrido de la ECEG: la segmentacion oficial se mantiene; conclusiones en `KNOWLEDGE_BASE.md`
+
+### Carpeta de pruebas locales
+- `pruebas_locales/` agregada a `.gitignore`: pruebas exploratorias que no se versionan (primera: segmentacion con escolaridad y marginacion CONAPO)
+
+### Escolaridad integrada en fichas y mapa
+- Renumerados: `11_escolaridad_eceg.ipynb` pasa a `10_escolaridad_eceg.ipynb` y `10_fichas_y_mapa.ipynb` a `11_fichas_y_mapa.ipynb`, para que el orden siga la ejecucion (las fichas leen `secciones_eceg_2020.parquet`)
+- `11_fichas_y_mapa.ipynb`: escolaridad por sexo de la seccion en cada celda; grado promedio y % posbasica en el resumen, encabezado y panel de cada ficha; nueva grafica de tramos de escolaridad frente al nacional; columna de escolaridad en la tabla de subperfiles; escolaridad media en popups, panel del mapa y `fichas_municipios.csv`. Ficha a 16 x 20 con la tabla de subperfiles a todo lo ancho. Reejecutado: mismos perfiles y cruces
+- Clases latentes confirmadas como segmentacion final
+
+### Escolaridad por seccion (ECEG 2020)
+- `src/descarga_inicial.py`: agregado el ZIP de Estadisticas Censales a Escalas Geoelectorales 2020 del INEGI (`eceg_2020`), extraido en `DATA/RAW/eceg_2020/` (agregado a `.gitignore`)
+- `notebooks/11_escolaridad_eceg.ipynb`: limpieza de codigos `-6` y secciones vacias, union con las celdas por EDOCVE + SECCION (100% de cobertura), escolaridad por sexo de la celda, relacion escolaridad-participacion por tipo de seccion y escolaridad por perfil, subperfil y tipo de seccion. Genera `secciones_eceg_2020.parquet` y CSV `escolaridad_*`
+
 ### Fichas y mapa de las clases latentes
 - `notebooks/10_fichas_y_mapa.ipynb`: vista general, 6 fichas de perfil (PNG 200 dpi y PDF), mapa estatico del perfil dominante por municipio y mapa interactivo folium; salidas en `DATA/PREPROCESSED/fichas/`
 - Cruce municipal por nombre normalizado en lugar de clave: las claves municipales del INE no coinciden con las del INEGI (detectado error en el mapa del 04)

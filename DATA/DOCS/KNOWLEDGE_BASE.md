@@ -60,7 +60,9 @@ INE_HACKATHON/
     07_segmentacion_jerarquica.ipynb  Microsegmentos KMeans + arbol Ward ponderado (perfil/subperfil/micro) (~2 min)
     08_clases_latentes.ipynb      Clases latentes sobre terciles por eleccion (~12 s)
     09_subperfiles_anidados.ipynb Clases latentes (o perfiles del 04) + subperfiles KMeans anidados + microtargeting (~20 s)
-    10_fichas_y_mapa.ipynb        Fichas PNG/PDF, vista general, mapa estatico e interactivo de las clases latentes (~1 min)
+    10_escolaridad_eceg.ipynb     Escolaridad e internet por seccion (ECEG 2020 INEGI-INE) unidos a celdas; por perfil y subperfil (~5 s)
+    11_fichas_y_mapa.ipynb        Fichas PNG/PDF, vista general, mapa estatico e interactivo de las clases latentes con escolaridad (~25 s)
+  pruebas_locales/            Pruebas exploratorias no versionadas (en .gitignore); no forman parte del flujo
   DATA/
     RAW/
       ZIPS/                   ZIPs descargados del INE
@@ -74,6 +76,7 @@ INE_HACKATHON/
       voto_anticipado_2024/   1 CSV
       prision_preventiva_2024/ 1 CSV
       marco_geoestadistico/  Shapefile CONABIO municipios 2022 (mun22gw.*)
+      eceg_2020/              Estadisticas Censales a Escalas Geoelectorales 2020 (INEGI): CSV por seccion, distrito y entidad, diccionario y catalogos
     PREPROCESSED/
       conteos_federal_2009_2024.parquet   54,872,712 filas (184 MB)
       conteos_pj2025.parquet              9,835,254 filas (76 MB)
@@ -85,6 +88,8 @@ INE_HACKATHON/
       experimentos_estabilidad.csv        18 candidatas con ARI bootstrap (generado en 05)
       experimentos_finalistas.csv         base_04 + 3 finalistas reajustadas (generado en 05)
       celdas_perfiles_candidatos.parquet  644,887 celdas con etiquetas de base_04 y finalistas (generado en 05)
+      secciones_eceg_2020.parquet         68,806 secciones con escolaridad por sexo, % posbasica y % viviendas con internet (generado en 10)
+      escolaridad_perfiles.csv, escolaridad_subperfiles.csv, escolaridad_perfil_tiposec.csv (generados en 10)
     DOCS/
       KNOWLEDGE_BASE.md       Este archivo
       CHANGELOG.md            Bitacora de cambios
@@ -249,7 +254,7 @@ Descarga integrada en `src/descarga_inicial.py`.
 Una figura matplotlib por perfil que consolida: trayectoria 2009-2024 (vs promedio nacional gris),
 panel de metricas (promedio, brecha, tendencia, genero, tipo de seccion, PJ 2025),
 distribucion de edad (vs nacional), distribucion regional (vs nacional) y top 5 entidades.
-Los datos del CCPC no incluyen escolaridad, ingreso ni autoadscripcion indigena/afromexicana.
+Los datos del CCPC no incluyen escolaridad, ingreso ni autoadscripcion indigena/afromexicana. La escolaridad se agrega desde la ECEG 2020 en el notebook 10.
 
 ### Mapa nacional interactivo
 
@@ -270,7 +275,7 @@ Se consulta abriendo `mapa_nacional_segmentacion.html`. El notebook se versiona 
 
 **Error de cruce municipal:** el 04 une datos y shapefile por clave (`MPIOCVE` = `CVE_MUN`), pero las claves
 municipales del INE no son las del INEGI: solo ~1,085 de 2,477 municipios coinciden en clave y nombre. Muchos
-municipios del mapa muestran datos de otro municipio. El notebook 10 cruza por nombre.
+municipios del mapa muestran datos de otro municipio. El notebook 11 cruza por nombre.
 
 ### Archivos generados
 
@@ -370,16 +375,69 @@ Ejecutado (~20 s) sobre 657,497 celdas (incluye Campeche). Arbol de arriba hacia
 - ARI perfil vs base_04 0.32; vs perfil del 07 0.26.
 - Salidas: `celdas_subperfiles.parquet`, `subperfiles_resumen.csv`, `subperfiles_microtargeting.csv`, `subperfiles_entidades.csv`, `subperfiles_personas_tipo.csv`, `subperfiles_municipios.csv`.
 
-## Fichas y mapa (`10_fichas_y_mapa.ipynb`)
+## Escolaridad e internet por seccion (`10_escolaridad_eceg.ipynb`)
 
-Ejecutado (~1 min). Visualizaciones de las 6 clases latentes (08) con subperfiles (09); requiere el 09 ejecutado con `ORIGEN_PERFILES = "clases_latentes"`.
+Fuente: **Estadisticas Censales a Escalas Geoelectorales 2020** (ECEG), producto INEGI-INE con 220 indicadores del Censo 2020 por seccion electoral (marco seccional INE, corte enero 2021). URL: `https://www.inegi.org.mx/contenidos/programas/ccpv/2020/datosabiertos/geoelectorales/eceg_2020_csv.zip`, descargada por `src/descarga_inicial.py` a `DATA/RAW/eceg_2020/`.
 
-- Nombres de trabajo automaticos (`NOMBRES = None`): P0 Baja participacion; P1 Participacion media, estable entre elecciones, en descenso; P2 Participacion media, se moviliza en presidenciales, en ascenso; P3 Participacion media-alta, estable entre elecciones; P4 Participacion media-alta, se moviliza en presidenciales, en ascenso; P5 Alta participacion.
+- Archivo usado: `conjunto_de_datos/INE_SECCION_2020.csv` (latin-1, 68,806 secciones, llave `ENTIDAD` + `SECCION`). Diccionario en `diccionario_de_datos/Descriptor_indicadores_ECEG_Seccion_2020.csv.csv`.
+- Variables: `GRAPROES` (grado promedio de escolaridad, 15 anos y mas) con `_F` y `_M`; `P18YM_PB / P_18YMAS` (% con educacion posbasica, 18 y mas) por sexo; `VPH_INTER / VIVPARH_CV` (% de viviendas particulares habitadas con internet, sin version por sexo).
+- `-6` es codigo de confidencialidad (6 secciones) y 66 secciones sin poblacion traen `0`: ambos se tratan como faltante. Afecta a 10,279 personas.
+- Union: 100% de las 657,497 celdas y de los 71.2M de personas. Cada celda toma la escolaridad de su seccion para su sexo.
+- El resto de los indicadores de la ECEG se probo en `pruebas_locales/` y no se integra (ver Pruebas con variables del censo).
+
+### Resultados
+- Escolaridad y participacion por seccion: correlacion ponderada 0.10 en general; 0.41 en urbanas, casi 0 en mixtas (-0.04) y rurales (0.02). En urbanas, secciones con 12+ grados participan 60.6 contra 50.9 en las de 8-10.
+- Grado promedio nacional ponderado por votantes: 9.68. Viviendas con internet: 51.4%.
+- Internet por perfil: P0 50.6, P1 49.3, P2 54.6, P3 51.8, P4 53.3, P5 49.1. Mas en P2 y P4 (urbanos y escolarizados), menos en P1 y P5.
+
+| Perfil | Grados | % posbasica | % en secciones <8 | % en 12+ | Urbana | Rural |
+|---|---|---|---|---|---|---|
+| 0 | 9.33 | 41.0 | 18.8 | 5.1 | 9.81 | 7.11 |
+| 1 | 9.12 | 38.2 | 23.9 | 4.8 | 9.71 | 7.28 |
+| 2 | 10.00 | 48.6 | 15.7 | 15.7 | 10.61 | 7.19 |
+| 3 | 9.60 | 43.6 | 19.2 | 10.9 | 10.28 | 7.42 |
+| 4 | 10.11 | 49.9 | 20.0 | 21.8 | 10.99 | 6.93 |
+| 5 | 9.78 | 46.2 | 25.5 | 19.4 | 11.01 | 7.17 |
+
+- P0 y P1 viven sobre todo en secciones de escolaridad media (8-10 grados) y casi nunca en las de 12+. P1 es el de menor escolaridad.
+- P5 esta polarizado: el mayor porcentaje en secciones <8 (rurales) y 19% en 12+ (urbanas); en urbanas tiene la escolaridad mas alta (11.0).
+- Dentro de cada tipo de seccion el rural es parejo (6.9-7.4); las diferencias entre perfiles estan en lo urbano.
+- Subperfiles extremos: 0.1 (8.18 grados, 43% en secciones <8), 5.5 (8.73), 4.4 (8.95) contra 4.1 (11.17), 2.2 (10.94) y 5.1 (10.83).
+- Limitacion: dato ecologico (promedio de la seccion para el sexo, 15 y mas), no escolaridad individual ni del grupo de edad. Censo 2020 contra lista nominal 2024.
+
+## Fichas y mapa (`11_fichas_y_mapa.ipynb`)
+
+Ejecutado (~1 min). Visualizaciones de las 6 clases latentes (08) con subperfiles (09), escolaridad e internet (10); requiere el 09 ejecutado con `ORIGEN_PERFILES = "clases_latentes"` y el 10 ejecutado.
+
+- Nombres definitivos (`NOMBRES`): P0 Por convencer; P1 Constancia que se apaga; P2 Generación en ascenso; P3 Paso firme; P4 Voces que avanzan; P5 Pilar democrático. Se evitaron nombres que estigmatizan o que excluyen a parte del perfil (P4 es 68% mujeres, P2 no es el perfil mas joven).
+- Descriptor automatico (`DESCRIPTORES`, reglas de nivel, brecha y tendencia) como subtitulo en fichas, panel del mapa y `fichas_resumen_perfiles.csv`: P0 Baja participacion; P1 Participacion media, estable entre elecciones, en descenso; P2 Participacion media, se moviliza en presidenciales, en ascenso; P3 Participacion media-alta, estable entre elecciones; P4 Participacion media-alta, se moviliza en presidenciales, en ascenso; P5 Alta participacion.
 - Cruce municipal por nombre normalizado dentro de cada entidad: 2,354 exactos, 10 por contenido, 7 aproximados (revisables en la seccion 6.3), 5 sin cruce (nombres ambiguos de Oaxaca y municipios nuevos de Sinaloa; 54,695 personas). Municipios con menos de 1,000 personas se muestran sin datos: 2,171 de 2,475 con datos.
 - Perfil dominante por municipio: P0 346, P1 38, P2 315, P3 215, P4 307, P5 950.
-- Mapa interactivo: tiles por URL directa del CDN de CARTO (`basemaps.cartocdn.com/light_all`; el alias `CartoDB positron` de folium ahora pide API key). Capa municipal (opacidad segun % del perfil dominante, popup con composicion y subperfil dominante) y estatal; panel abajo a la izquierda. ~12.4 MB; no se despliega en el notebook.
+- Escolaridad e internet integrados: grado promedio, % posbasica y % viviendas con internet en el resumen y en el bloque "Contexto de la seccion" del panel de cada ficha (escolaridad tambien en el encabezado); grafica de tramos de escolaridad frente al nacional; columna de escolaridad en la tabla de subperfiles; escolaridad e internet en los popups municipal y estatal, en el panel del mapa y en `fichas_municipios.csv`.
+- Ficha de 16 x 20 pulgadas: trayectoria y metricas; edad, region y escolaridad; entidades sobrerrepresentadas (8) y mapa de presencia; tabla de subperfiles a todo lo ancho.
+- Mapa interactivo: tiles por URL directa del CDN de CARTO (`basemaps.cartocdn.com/light_all`; el alias `CartoDB positron` de folium ahora pide API key). Capa municipal (opacidad segun % del perfil dominante, popup con composicion y subperfil dominante) y estatal; panel abajo a la izquierda. ~12.5 MB; no se despliega en el notebook.
 - Salidas en `DATA/PREPROCESSED/fichas/`: `vista_general.png`, `ficha_perfil_{0..5}.png` (200 dpi), `fichas_perfiles.pdf`, `mapa_perfil_dominante.png`, `mapa_clases_latentes.html`, `fichas_resumen_perfiles.csv`, `fichas_municipios.csv`, `fichas_cruce_municipios.csv`.
 - Shapefile `mun22gw` descargado localmente en `DATA/RAW/marco_geoestadistico/` con las funciones de `src/descarga_inicial.py`.
+
+## Pruebas con variables del censo (`pruebas_locales/`, no versionado)
+
+Pregunta: cambia la segmentacion si el modelo de clases latentes recibe, ademas de las 6 elecciones, variables de contexto como indicadores. Mismo EM y regla de seleccion de k que el 08; ademas, descriptiva por perfil contra el nacional. Notebooks: `prueba_escolaridad_marginacion`, `prueba_escolaridad_economia`, `prueba_indigena_afro_descriptores`, `prueba_barrido_censo`.
+
+**Decision:** la segmentacion oficial (solo conducta) se queda. Las variables de contexto se usan como descriptores, no como entradas. Separar por el eje territorial no evalua comportamiento: describe lugares.
+
+### Resultados por tema
+- **Escolaridad:** ARI vs oficial 0.82, estable; solo separa la parte rural del P2 (18%). Es la variable del censo que mejor describe a los perfiles y resiste el control por sexo.
+- **Marginacion municipal CONAPO 2020:** ARI 0.67; arma una clase de municipios marginados (8%). Con escolaridad (ARI 0.49) el modelo divide el territorio en urbano-escolarizado y rural-marginado. El 71% de los votantes vive en municipios de marginacion muy baja.
+- **Economia (PEA, desocupacion):** sin efecto. El gradiente aparente (69.7% de participacion economica en P0 a 55.8% en P5) es composicion por sexo: dentro de cada sexo ningun perfil se aleja mas de 1.5 puntos del nacional. Escolaridad + economia con terciles globales es la unica variante inestable (ARI bootstrap 0.69); con terciles dentro del sexo se estabiliza (0.98).
+- **Indigena y afromexicana:** no cambian la segmentacion (ARI 0.95-0.99). Secciones con 40% o mas en hogares indigenas (7% de votantes) participan mas: 63.1 contra 55.1 en promedio y 11-13 puntos mas en intermedias (2015: 58.4 vs 47.6; 2021: 64.9 vs 51.7), con menor brecha presidencial (10.7 vs 13.6). Se concentran en P5 (13.2% vive en secciones indigenas, nacional 7.1%) y P4 (8.1%). Afromexicana sin diferencias.
+- **Barrido de 118 indicadores base de la ECEG:** el mejor (secundaria completa) tiene eta cuadrada de 0.08 dentro de sexo; edad < 40 tiene 0.29 y sexo 0.10. Ningun indicador del censo describe a los perfiles tanto como la edad o el sexo del CCPC. Destacan: estructura educativa, estructura de edad de la seccion, afiliacion al ISSSTE (P4 7.9%, P2 7.3%, P1 3.8%) y bienes de vivienda (cisterna, internet, computadora, mas en P2 y P4). Discapacidad, migracion, situacion conyugal, jefatura de hogar y salud no distinguen.
+- **11 variantes del barrido:** todas k = 6. Casi identicas a la oficial salvo internet (ARI 0.85, bootstrap minimo 0.75) y fecundidad (ARI 0.80), que separan la parte rural del P2.
+
+### Hallazgos para el documento
+- **Eje territorial:** aparece con escolaridad, marginacion, economia, internet y fecundidad: rural, baja escolaridad, mas presencia indigena y participacion igual o mayor al promedio (clases de 8-14% con 54-72% de participacion). La baja participacion es urbana y joven, no rural ni marginada: P0 tiene 4-5% en municipios de marginacion alta.
+- Secciones indigenas con mayor participacion, sobre todo en intermedias.
+- Internet en la vivienda como guia de canales: digital para P2 y P4; presencial o medios tradicionales para P1 y P5.
+- Limitacion comun: datos ecologicos de la seccion (2020) y marginacion municipal.
 
 ## Entorno
 
@@ -424,7 +482,7 @@ Ejecutado (~1 min). Visualizaciones de las 6 clases latentes (08) con subperfile
 - IML = (Hombres en LN / Mujeres en LN) x 100
 - IMV = (Hombres que SV / Mujeres que SV) x 100
 
-**Nota:** Los datos de poblacion indigena y afromexicana estan disponibles como FILTRO en los tableros interactivos pero NO aparecen como columna en los CSVs descargados.
+**Nota:** Los datos de poblacion indigena y afromexicana estan disponibles como FILTRO en los tableros interactivos pero NO aparecen como columna en los CSVs descargados. Por seccion se pueden tomar de la ECEG 2020 (`PHOG_IND`, `POB_AFRO`).
 
 ## Estado del Proyecto
 
@@ -445,9 +503,10 @@ Ejecutado (~1 min). Visualizaciones de las 6 clases latentes (08) con subperfile
 - [x] Segmentacion jerarquica macro/micro (notebook 07; inestable, ARI 0.33)
 - [x] Clases latentes (notebook 08; k=6, ARI 0.98)
 - [x] Subperfiles anidados en clases latentes (notebook 09; 6 perfiles, 27 subperfiles)
-- [x] Fichas y mapa de las clases latentes (notebook 10)
-- [ ] Confirmar clases latentes como segmentacion final y fijar nombres definitivos (`NOMBRES` en el 10)
-- [ ] Elegir segmentacion final (niveles vs tipos de conducta)
+- [x] Escolaridad por seccion desde la ECEG 2020 (notebook 10)
+- [x] Fichas y mapa de las clases latentes con escolaridad (notebook 11)
+- [x] Segmentacion final: clases latentes (notebook 08, k=6) con subperfiles del 09
+- [x] Nombres definitivos de los perfiles (`NOMBRES` en el 11)
 - [ ] Propuesta de estrategias
 - [ ] Documento tecnico
 - [ ] Fichas de perfil

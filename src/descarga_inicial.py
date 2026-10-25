@@ -1,7 +1,8 @@
 """
 Descarga inicial de todos los recursos del proyecto.
 
-Datasets de la plataforma CCPC del INE (ZIPs con CSVs)
+Datasets de la plataforma CCPC del INE (ZIPs con CSVs), Estadisticas Censales
+a Escalas Geoelectorales 2020 del INEGI (indicadores del censo por seccion)
 y documentos informativos del hackaton (PDFs).
 
 Estructura de salida:
@@ -43,6 +44,7 @@ SUBDIRS_RAW = [
     "conteosPJ2025",
     "voto_anticipado_2024",
     "prision_preventiva_2024",
+    "eceg_2020",
 ]
 
 
@@ -68,6 +70,7 @@ DATASETS = {
     "conteosPJ2025": "https://ine.mx/wp-content/uploads/2026/09/DatosAbiertos_DECEyEC_ConteosCensalesPJ2025.zip",
     "voto_anticipado_2024": "https://ine.mx/wp-content/uploads/2025/08/DatosAbiertos_DECEyEC_ConteosCensales_VotoAnticipado2024.zip",
     "prision_preventiva_2024": "https://ine.mx/wp-content/uploads/2025/08/DatosAbiertos_DECEyEC_ConteosCensales_PrisionPreventiva2024.zip",
+    "eceg_2020": "https://www.inegi.org.mx/contenidos/programas/ccpv/2020/datosabiertos/geoelectorales/eceg_2020_csv.zip",
 }
 
 # ---------------------------------------------------------------------------
