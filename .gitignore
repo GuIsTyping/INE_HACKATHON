@@ -32,3 +32,6 @@ DATA/RAW/marco_geoestadistico/
 
 # Pruebas exploratorias locales (no se versionan)
 pruebas_locales/
+
+# DB_Store
+.DS_Store
