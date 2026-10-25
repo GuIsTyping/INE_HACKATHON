@@ -60,6 +60,7 @@ INE_HACKATHON/
     07_segmentacion_jerarquica.ipynb  Microsegmentos KMeans + arbol Ward ponderado (perfil/subperfil/micro) (~2 min)
     08_clases_latentes.ipynb      Clases latentes sobre terciles por eleccion (~12 s)
     09_subperfiles_anidados.ipynb Clases latentes (o perfiles del 04) + subperfiles KMeans anidados + microtargeting (~20 s)
+    10_fichas_y_mapa.ipynb        Fichas PNG/PDF, vista general, mapa estatico e interactivo de las clases latentes (~1 min)
   DATA/
     RAW/
       ZIPS/                   ZIPs descargados del INE
@@ -69,7 +70,7 @@ INE_HACKATHON/
       conteos2018/
       conteos2021/
       conteos2024/
-      conteosPJ2025/          31 CSVs (sin entidad 32)
+      conteosPJ2025/          31 CSVs (sin Campeche, entidad 4)
       voto_anticipado_2024/   1 CSV
       prision_preventiva_2024/ 1 CSV
       marco_geoestadistico/  Shapefile CONABIO municipios 2022 (mun22gw.*)
@@ -109,7 +110,7 @@ Columnas estandar: AELEC, FELECCION, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCION, 
 
 ### Dataset PJ 2025 (conteosPJ2025)
 
-- 31 CSVs, ~9.8M filas
+- 31 CSVs, ~9.8M filas. No incluye Campeche (EDOCVE 4): `P_PJ2025` es nulo en todas sus secciones
 - Columnas: AELEC, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCION, TIPOSEC, DEF, CJ, DEJ, SEXO, EDAD, LN, SV, NV, NS
 - Diferencias: sin FELECCION, sin DEL; usa CJ (Circuito Judicial) y DEJ (Distrito Judicial Electoral)
 - Marco cartografico: DERFE 2025
@@ -168,7 +169,7 @@ El parquet federal se escribio con PyArrow ParquetWriter (un row group por ano) 
 - Voto anticipado y prision preventiva son un registro por voto (sin edad ni seccion). En prision preventiva la clave de entidad es `ESTADO`.
 
 ### Cobertura
-- 32 entidades en todos los anos federales (PJ 2025: 31). Municipios 2,455-2,477; secciones 64,934 (2009) a 70,751 (2024).
+- 32 entidades en todos los anos federales (PJ 2025: 31, falta Campeche). Municipios 2,455-2,477; secciones 64,934 (2009) a 70,751 (2024).
 - 72,681 secciones distintas (EDOCVE + SECCION); 62,048 (85%) presentes en las 6 elecciones federales.
 
 ### Participacion (SV / (SV + NV))
@@ -267,6 +268,10 @@ Geometrias simplificadas (tolerancia 0.008 municipal, 0.01 estatal). HTML ~24 MB
 El mapa no se despliega dentro del notebook (embebido pesaria ~54 MB y GitHub no podria renderizarlo).
 Se consulta abriendo `mapa_nacional_segmentacion.html`. El notebook se versiona con el resto de sus outputs (~1.3 MB).
 
+**Error de cruce municipal:** el 04 une datos y shapefile por clave (`MPIOCVE` = `CVE_MUN`), pero las claves
+municipales del INE no son las del INEGI: solo ~1,085 de 2,477 municipios coinciden en clave y nombre. Muchos
+municipios del mapa muestran datos de otro municipio. El notebook 10 cruza por nombre.
+
 ### Archivos generados
 
 | Archivo | Contenido |
@@ -279,7 +284,7 @@ Se consulta abriendo `mapa_nacional_segmentacion.html`. El notebook se versiona 
 ## Experimentos de clustering (`05_experimentos_clustering.ipynb`)
 
 ### Diseno
-- Poblacion: 644,887 celdas con peso y P_PJ2025 (96.4% del peso). Muestras extraidas con probabilidad proporcional al peso (eval 10k fija, fit 60k, sub 8k).
+- Poblacion: 644,887 celdas con peso y P_PJ2025 (96.4% del peso). **Este filtro excluye todo Campeche** (sin datos PJ 2025) y ~8k celdas de otras entidades; aplica a los notebooks 05, 06 y 07. Los notebooks 08-10 ya no lo aplican. Muestras extraidas con probabilidad proporcional al peso (eval 10k fija, fit 60k, sub 8k).
 - 9 conjuntos de variables: A_base (promedio, brecha, tendencia), B_indicadores (+desviacion, P_PJ2025), C_trayectoria (P2009..P2024), D_trayectoria_pj, E-H (conducta + edad ordinal, mujer, tipo de seccion ordinal, region dummies), I_solo_demo (control).
 - Preprocesamiento: estandar, robusto, estandar + PCA 90% (solo con mas de 3 variables). 26 combinaciones.
 - Algoritmos: KMeans, BisectingKMeans, Birch, GMM (4 covarianzas), aglomerativo (ward, average, complete), espectral, HDBSCAN. k de 3 a 8. 2,028 configuraciones.
@@ -328,7 +333,7 @@ Ejecutado con `VARIABLES = "A_base"` (~2 min).
 
 ## Clases latentes (`08_clases_latentes.ipynb`)
 
-Ejecutado (~12 s).
+Ejecutado (~12 s) sobre 657,497 celdas (71.2M personas): conserva las celdas sin PJ 2025, incluido Campeche.
 
 - Indicadores: cada eleccion federal en terciles ponderados (baja, media, alta), relativos a esa eleccion. `INCLUIR_PJ` agrega PJ 2025 como septimo indicador (por defecto no).
 - Celdas colapsadas a patrones unicos (maximo 729) con su peso; peso normalizado para sumar el numero de celdas.
@@ -339,31 +344,42 @@ Ejecutado (~12 s).
 
 ### Resultados
 - 728 de 729 patrones observados. Los mas comunes: siempre bajo (12.3% de personas) y siempre alto (11.3%).
-- BIC baja en todo el rango (mejora 1.1% de 3 a 4 clases, < 0.3% desde 7). Elegido k = 6 (menor BIC en 4-6, clase minima 8.7%). Entropia 0.77; 68.7% de personas con asignacion clara.
-- **Muy estable:** ARI bootstrap 0.99 (minimo 0.97).
+- BIC baja en todo el rango (mejora 1.1% de 3 a 4 clases, < 0.3% desde 7). Elegido k = 6 (menor BIC en 4-6, clase minima 8.3%). Entropia 0.78; 69.0% de personas con asignacion clara.
+- **Muy estable:** ARI bootstrap 0.98 (minimo 0.95).
 - Estructura nivel x forma emergente: los niveles medios se dividen por forma.
 
 | Clase | % pob | Prom | Brecha | Tend | % mujer | Edad dominante | Asignacion clara |
 |---|---|---|---|---|---|---|---|
-| 0 | 21.4 | 37.4 | 14.3 | +1.1 | 25 | 30-39 (87% < 40) | 92% |
-| 1 | 8.7 | 48.9 | 7.8 | -1.4 | 44 | 30-39 | 42% |
-| 2 | 18.2 | 50.5 | 18.7 | +3.0 | 53 | 30-39 | 60% |
-| 3 | 16.4 | 60.4 | 9.3 | -0.1 | 57 | 40-49 | 57% |
-| 4 | 11.8 | 62.1 | 19.5 | +4.5 | 68 | 40-49 | 50% |
-| 5 | 23.4 | 72.9 | 10.7 | +1.8 | 69 | 50-59 | 82% |
+| 0 | 21.4 | 37.3 | 14.3 | +1.1 | 25 | 30-39 (87% < 40) | 92% |
+| 1 | 8.3 | 48.5 | 7.6 | -1.6 | 44 | 30-39 | 44% |
+| 2 | 18.6 | 50.5 | 18.4 | +3.0 | 53 | 30-39 | 59% |
+| 3 | 16.3 | 60.3 | 9.3 | -0.1 | 57 | 40-49 | 57% |
+| 4 | 11.8 | 62.0 | 19.5 | +4.5 | 68 | 40-49 | 51% |
+| 5 | 23.5 | 72.8 | 10.6 | +1.8 | 69 | 50-59 | 82% |
 
-- ARI vs base_04 0.34, vs ganador_05 0.38, vs forma_1 0.09, vs perfil del 07 0.27.
+- ARI vs base_04 0.32, vs ganador_05 0.38, vs forma_1 0.08, vs perfil del 07 0.26 (esos modelos no incluyen Campeche).
 
 ## Subperfiles anidados (`09_subperfiles_anidados.ipynb`)
 
-Ejecutado (~20 s). Arbol de arriba hacia abajo: perfiles de origen configurable (`ORIGEN_PERFILES`, por defecto `"clases_latentes"`; alternativa `"base_04"`), renumerados por promedio, y KMeans ponderado dentro de cada perfil sobre A_base.
+Ejecutado (~20 s) sobre 657,497 celdas (incluye Campeche). Arbol de arriba hacia abajo: perfiles de origen configurable (`ORIGEN_PERFILES`, por defecto `"clases_latentes"`; alternativa `"base_04"`), renumerados por promedio, y KMeans ponderado dentro de cada perfil sobre A_base.
 
-- **Los perfiles de base_04 son solo moderadamente estables:** ARI bootstrap medio 0.74, minimo 0.50 (medido en este notebook con `ORIGEN_PERFILES = "base_04"`). Por eso el origen por defecto son las clases latentes (ARI 0.99).
-- Seleccion por perfil: mayor k con ARI >= 0.8 y subperfil minimo >= 2% de la poblacion. Con clases latentes: {0: 5, 1: 3, 2: 5, 3: 5, 4: 4, 5: 5} = 27 subperfiles (2.3% a 6.5% de la poblacion), ARI condicional 0.91-0.97. Con base_04 eran 18.
-- Subperfiles destacados (clases latentes): 1.1 (brecha 2.7, tendencia -3.5; Sonora indice 841, Colima 615); 3.5 (brecha 0.9, tendencia -3.0, 56% rural; Colima 889); 4.3 (brecha 21.7, tendencia +7.3; Tlaxcala 1029; dominante en 203 municipios); 2.1 (tendencia +6.5; Tlaxcala 966); 0.1 (promedio 33.2, 16% mujeres, 48% rural); 5.5 (promedio 76.5, brecha 1.9, 63% rural; dominante en 298 municipios).
-- Microtargeting: indice de sobrerrepresentacion por entidad (minimo 20k personas) y por persona-tipo sexo x edad; subperfil dominante en 2,158 municipios con al menos 1,000 personas.
-- ARI perfil vs base_04 0.34; vs perfil del 07 0.27.
+- **Los perfiles de base_04 son solo moderadamente estables:** ARI bootstrap medio 0.74, minimo 0.50 (medido en este notebook con `ORIGEN_PERFILES = "base_04"`). Por eso el origen por defecto son las clases latentes (ARI 0.98).
+- Seleccion por perfil: mayor k con ARI >= 0.8 y subperfil minimo >= 2% de la poblacion. Con clases latentes: {0: 5, 1: 3, 2: 5, 3: 5, 4: 4, 5: 5} = 27 subperfiles (2.2% a 6.4% de la poblacion), ARI condicional 0.93-0.98. Con base_04 eran 18.
+- Subperfiles destacados (clases latentes): 1.1 (brecha 2.2, tendencia -3.8; Sonora indice 833, Colima 555); 3.5 (brecha 0.7, tendencia -3.1, 57% rural; Colima 842); 4.3 (brecha 21.9, tendencia +7.3; Tlaxcala 1046; dominante en 201 municipios); 2.1 (tendencia +6.4; Tlaxcala 940); 0.1 (promedio 33.2, 17% mujeres, 48% rural); 5.5 (promedio 76.5, brecha 1.8, 62% rural; Campeche 715; dominante en 311 municipios).
+- Microtargeting: indice de sobrerrepresentacion por entidad (minimo 20k personas) y por persona-tipo sexo x edad; subperfil dominante en 2,175 municipios con al menos 1,000 personas (tabla con nombres y claves INE, sin geometria).
+- ARI perfil vs base_04 0.32; vs perfil del 07 0.26.
 - Salidas: `celdas_subperfiles.parquet`, `subperfiles_resumen.csv`, `subperfiles_microtargeting.csv`, `subperfiles_entidades.csv`, `subperfiles_personas_tipo.csv`, `subperfiles_municipios.csv`.
+
+## Fichas y mapa (`10_fichas_y_mapa.ipynb`)
+
+Ejecutado (~1 min). Visualizaciones de las 6 clases latentes (08) con subperfiles (09); requiere el 09 ejecutado con `ORIGEN_PERFILES = "clases_latentes"`.
+
+- Nombres de trabajo automaticos (`NOMBRES = None`): P0 Baja participacion; P1 Participacion media, estable entre elecciones, en descenso; P2 Participacion media, se moviliza en presidenciales, en ascenso; P3 Participacion media-alta, estable entre elecciones; P4 Participacion media-alta, se moviliza en presidenciales, en ascenso; P5 Alta participacion.
+- Cruce municipal por nombre normalizado dentro de cada entidad: 2,354 exactos, 10 por contenido, 7 aproximados (revisables en la seccion 6.3), 5 sin cruce (nombres ambiguos de Oaxaca y municipios nuevos de Sinaloa; 54,695 personas). Municipios con menos de 1,000 personas se muestran sin datos: 2,171 de 2,475 con datos.
+- Perfil dominante por municipio: P0 346, P1 38, P2 315, P3 215, P4 307, P5 950.
+- Mapa interactivo: tiles por URL directa del CDN de CARTO (`basemaps.cartocdn.com/light_all`; el alias `CartoDB positron` de folium ahora pide API key). Capa municipal (opacidad segun % del perfil dominante, popup con composicion y subperfil dominante) y estatal; panel abajo a la izquierda. ~12.4 MB; no se despliega en el notebook.
+- Salidas en `DATA/PREPROCESSED/fichas/`: `vista_general.png`, `ficha_perfil_{0..5}.png` (200 dpi), `fichas_perfiles.pdf`, `mapa_perfil_dominante.png`, `mapa_clases_latentes.html`, `fichas_resumen_perfiles.csv`, `fichas_municipios.csv`, `fichas_cruce_municipios.csv`.
+- Shapefile `mun22gw` descargado localmente en `DATA/RAW/marco_geoestadistico/` con las funciones de `src/descarga_inicial.py`.
 
 ## Entorno
 
@@ -427,9 +443,10 @@ Ejecutado (~20 s). Arbol de arriba hacia abajo: perfiles de origen configurable 
 - [x] Experimentos de clustering (2,028 configuraciones, estabilidad y finalistas)
 - [x] Experimentos de forma y embeddings (notebook 06)
 - [x] Segmentacion jerarquica macro/micro (notebook 07; inestable, ARI 0.33)
-- [x] Clases latentes (notebook 08; k=6, ARI 0.99)
+- [x] Clases latentes (notebook 08; k=6, ARI 0.98)
 - [x] Subperfiles anidados en clases latentes (notebook 09; 6 perfiles, 27 subperfiles)
-- [ ] Confirmar clases latentes como segmentacion final y regenerar fichas y mapa (hoy basados en el notebook 04)
+- [x] Fichas y mapa de las clases latentes (notebook 10)
+- [ ] Confirmar clases latentes como segmentacion final y fijar nombres definitivos (`NOMBRES` en el 10)
 - [ ] Elegir segmentacion final (niveles vs tipos de conducta)
 - [ ] Propuesta de estrategias
 - [ ] Documento tecnico

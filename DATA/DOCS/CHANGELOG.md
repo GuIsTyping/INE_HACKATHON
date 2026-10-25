@@ -2,6 +2,17 @@
 
 ## 2026-10-25
 
+### Fichas y mapa de las clases latentes
+- `notebooks/10_fichas_y_mapa.ipynb`: vista general, 6 fichas de perfil (PNG 200 dpi y PDF), mapa estatico del perfil dominante por municipio y mapa interactivo folium; salidas en `DATA/PREPROCESSED/fichas/`
+- Cruce municipal por nombre normalizado en lugar de clave: las claves municipales del INE no coinciden con las del INEGI (detectado error en el mapa del 04)
+- Tiles del mapa por URL directa del CDN de CARTO (el alias de folium ahora pide API key)
+- Shapefile `mun22gw` descargado localmente
+
+### Campeche incluido en 08 y 09
+- Detectado que PJ 2025 no tiene Campeche (no Zacatecas como decia la KB) y que el filtro de casos completos por `P_PJ2025` lo excluia de los notebooks 05-09
+- 08 y 09 ya no filtran por `P_PJ2025`; promedios PJ calculados solo con celdas con dato. Reejecutados sobre 657,497 celdas: misma estructura de 6 clases (ARI bootstrap 0.98), 27 subperfiles
+- 09: comparacion con modelos previos tolera celdas sin etiqueta; con origen `base_04` se excluyen las celdas sin perfil
+
 ### Subperfiles sobre clases latentes
 - `notebooks/09_subperfiles_anidados.ipynb`: parametro `ORIGEN_PERFILES` (por defecto `"clases_latentes"`, alternativa `"base_04"`); reejecutado con las 6 clases latentes como perfiles: 27 subperfiles. Sobrescribe `celdas_subperfiles.parquet` y CSV `subperfiles_*`
 

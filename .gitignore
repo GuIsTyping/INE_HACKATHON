@@ -27,3 +27,4 @@ __pycache__/
 
 # UV lock (reproducible con uv sync)
 # uv.lock
+DATA/RAW/marco_geoestadistico/
