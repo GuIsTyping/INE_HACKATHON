@@ -55,6 +55,11 @@ INE_HACKATHON/
     02_perfilado_datos.ipynb  Calidad, cobertura y participacion por variable
     03_analisis_exploratorio.ipynb  Historial por seccion y celda, cohortes, regiones, PJ 2025
     04_segmentacion.ipynb         Clustering nacional ponderado + mapa nacional interactivo
+    05_experimentos_clustering.ipynb  Busqueda en malla de variables, preprocesamiento y algoritmos (~19 min)
+    06_experimentos_forma_embeddings.ipynb  Forma de trayectoria + UMAP/t-SNE (~37 min)
+    07_segmentacion_jerarquica.ipynb  Microsegmentos KMeans + arbol Ward ponderado (perfil/subperfil/micro) (~2 min)
+    08_clases_latentes.ipynb      Clases latentes sobre terciles por eleccion (~12 s)
+    09_subperfiles_anidados.ipynb Clases latentes (o perfiles del 04) + subperfiles KMeans anidados + microtargeting (~20 s)
   DATA/
     RAW/
       ZIPS/                   ZIPs descargados del INE
@@ -75,6 +80,10 @@ INE_HACKATHON/
       prision_preventiva_2024.parquet     26,563 filas
       secciones_historial.parquet         54,892 filas (generado en 03)
       celdas_historial.parquet            657,497 filas (generado en 03)
+      experimentos_clustering.csv         2,028 configuraciones con metricas (generado en 05)
+      experimentos_estabilidad.csv        18 candidatas con ARI bootstrap (generado en 05)
+      experimentos_finalistas.csv         base_04 + 3 finalistas reajustadas (generado en 05)
+      celdas_perfiles_candidatos.parquet  644,887 celdas con etiquetas de base_04 y finalistas (generado en 05)
     DOCS/
       KNOWLEDGE_BASE.md       Este archivo
       CHANGELOG.md            Bitacora de cambios
@@ -255,6 +264,9 @@ sobre la distribucion de edad, genero y tipo de asentamiento del cluster, combin
 participacion, brecha y tendencia. No hay nombres hardcodeados.
 Geometrias simplificadas (tolerancia 0.008 municipal, 0.01 estatal). HTML ~24 MB.
 
+El mapa no se despliega dentro del notebook (embebido pesaria ~54 MB y GitHub no podria renderizarlo).
+Se consulta abriendo `mapa_nacional_segmentacion.html`. El notebook se versiona con el resto de sus outputs (~1.3 MB).
+
 ### Archivos generados
 
 | Archivo | Contenido |
@@ -264,11 +276,100 @@ Geometrias simplificadas (tolerancia 0.008 municipal, 0.01 estatal). HTML ~24 MB
 | `resumen_municipios.csv` | 1,858 municipios con k local y perfil dominante |
 | `mapa_nacional_segmentacion.html` | Mapa interactivo folium con 2 capas y panel (~24 MB) |
 
+## Experimentos de clustering (`05_experimentos_clustering.ipynb`)
+
+### Diseno
+- Poblacion: 644,887 celdas con peso y P_PJ2025 (96.4% del peso). Muestras extraidas con probabilidad proporcional al peso (eval 10k fija, fit 60k, sub 8k).
+- 9 conjuntos de variables: A_base (promedio, brecha, tendencia), B_indicadores (+desviacion, P_PJ2025), C_trayectoria (P2009..P2024), D_trayectoria_pj, E-H (conducta + edad ordinal, mujer, tipo de seccion ordinal, region dummies), I_solo_demo (control).
+- Preprocesamiento: estandar, robusto, estandar + PCA 90% (solo con mas de 3 variables). 26 combinaciones.
+- Algoritmos: KMeans, BisectingKMeans, Birch, GMM (4 covarianzas), aglomerativo (ward, average, complete), espectral, HDBSCAN. k de 3 a 8. 2,028 configuraciones.
+- Metricas: sil, db, ch (espacio propio), sil_ref (espacio comun: 6 tasas + PJ estandarizadas), r2_prom (eta cuadrada del promedio), V de Cramer con edad y sexo.
+- Validez: k 4-6, perfil minimo 5%, ruido maximo 10%. Puntaje = promedio de rangos de sil, sil_ref y r2_prom. Estabilidad: ARI medio en 5 bootstraps (umbral 0.8).
+
+### Resultados
+- 521 de 2,028 configuraciones validas. Silhouette maximo 0.31: los datos son un continuo, no grupos separados.
+- Demografia como variable: descartada. Baja sil_ref (0.12 -> 0.00) y r2_prom (0.69 -> 0.36) y los perfiles se separan por sexo (V sexo 0.57; HDBSCAN en E_base_demo da V sexo = 1.0). Solo demografia: sil_ref negativo.
+- Algoritmos descartados: aglomerativo average/complete (un cluster gigante), HDBSCAN (sin estructura de densidad; k fuera de rango o separa por sexo), Birch y aglomerativo ward (ARI < 0.5), espectral k=5 y GMM diag/tied en D (inestables).
+- Ganador: C_trayectoria + estandar + PCA, k=4. GMM esferico, BisectingKMeans y KMeans dan casi la misma particion (ARI entre ellos 0.83-0.95; ARI bootstrap 0.93-0.98).
+- Los finalistas son niveles de participacion (promedio 35 / 49 / 62 / 75) con brecha y tendencia casi iguales entre perfiles. base_04 (A_base) separa tipos de conducta (brecha 5 a 22, tendencia -1.7 a +4.4) con menor separacion. ARI base_04 vs finalistas: 0.20 (segmentaciones distintas).
+- Sesgo del puntaje: r2_prom y sil_ref favorecen particiones por nivel, y el espacio de referencia es casi igual a C_trayectoria. La eleccion entre "niveles" (C) y "tipos de conducta" (A) queda pendiente del equipo.
+
+## Forma de trayectoria y embeddings (`06_experimentos_forma_embeddings.ipynb`)
+
+- Variables de forma: `F2009..F2024` (tasa menos promedio de la celda) y `Z2009..Z2024` (forma estandarizada por fila). Conjuntos: A_base, C_trayectoria (referencias), S_forma, S_forma_pj, S_forma_z.
+- Embeddings sobre la muestra sub (8k): ninguno, UMAP (n_neighbors 15/50, min_dist 0.0/0.1, 2/5 dimensiones), t-SNE (perplejidad 30/100). Clustering en el embedding y extension por KNN en el espacio original. Metricas siempre en el espacio original.
+- Algoritmos: KMeans, GMM full, ward, HDBSCAN. 2,376 configuraciones. Dos puntajes: score_nivel (sil, sil_nivel, r2_prom) y score_forma (sil, sil_forma, r2_forma = eta cuadrada media de brecha y tendencia).
+- Estabilidad con 3 bootstraps; finalistas: 2 por forma y 1 por nivel, mas base_04 y ganador_05 como referencias.
+- Salidas: `experimentos_forma_embeddings.csv`, `experimentos_forma_estabilidad.csv`, `experimentos_forma_finalistas.csv`, `celdas_perfiles_candidatos_forma.parquet`.
+- 884 de 2,376 configuraciones validas.
+- UMAP y t-SNE: descartados. No mejoran ninguna metrica frente a no usar embedding y son menos estables (UMAP sobre S_forma ARI 0.56-0.67; t-SNE 0.38). HDBSCAN sobre UMAP sigue sin estructura: 128 de 432 con ruido > 10%, solo 4 validas.
+- Forma: S_forma + KMeans k=5 es estable (ARI 0.95). Perfiles con nivel parecido (promedio 51-61) pero brecha de 7.5 a 20.9 y tendencia de -1.8 a +5.1. Casi independientes de la demografia (V edad 0.14, V sexo 0.06) y ligados al territorio (rural o mixta de 14% a 49%).
+- Nivel y forma son ejes ortogonales: ARI entre el ganador de nivel (C) y el de forma (S) = 0.03. La edad y el sexo explican el nivel, no la forma.
+- base_04 (A_base) es el unico balanceado: r2_prom 0.57 y r2_forma 0.58. Ganador_05 explica nivel (0.90) pero no forma (0.04); S_forma al reves (0.08 y 0.62).
+- S_forma con y sin PCA producen la misma particion (ARI 1.0), por lo que dos finalistas de forma son duplicados; nivel_3 es identico a ganador_05.
+
+## Segmentacion jerarquica (`07_segmentacion_jerarquica.ipynb`)
+
+Ejecutado con `VARIABLES = "A_base"` (~2 min).
+
+- Etapa 1: KMeans ponderado con 50, 100 o 200 microsegmentos sobre todas las celdas; se elige el menor con R2 ponderado >= 0.95.
+- Etapa 2: Ward ponderado (implementacion propia, costo `w_a w_b / (w_a + w_b) ||c_a - c_b||^2`, salida en formato `linkage` de scipy) sobre los centros. Se valida contra el Ward de scipy con pesos iguales.
+- Cortes: 4-6 perfiles (por silhouette) y 15 subperfiles, anidados. Perfiles numerados por promedio; subperfiles como `p.j`.
+- Espacio configurable con `VARIABLES` (A_base, C_trayectoria, S_forma) y `USAR_PCA`; por defecto A_base hasta decidir niveles vs forma.
+- Estabilidad por bootstrap de Poisson (3 replicas), comparacion ARI con `celdas_perfiles_candidatos.parquet`, tabla territorial por municipio.
+- Salidas: `celdas_jerarquia.parquet`, `jerarquia_perfiles.csv`, `jerarquia_subperfiles.csv`, `jerarquia_microsegmentos.csv`, `jerarquia_municipios.csv`.
+
+### Resultados
+- N_MICRO = 200 (R2 0.961; 50 y 100 no llegan a 0.95). Microsegmentos de tamano casi uniforme (0.09-0.9% de personas). Ward ponderado validado contra scipy (ARI 1.0).
+- K = 4 por silhouette (0.20; base_04 tiene 0.26). R2 0.51 (k=4) a 0.60 (k=6). Subperfiles por perfil: 5, 2, 5, 3.
+- **Inestable:** ARI bootstrap 0.33 (perfil) y 0.27 (subperfil). ARI vs base_04: 0.33. El arbol construido de abajo hacia arriba sobre un continuo cambia mucho entre remuestreos; el nivel macro no debe reemplazar a base_04.
+- Subperfiles descriptivamente utiles (ej. 3.1: brecha -0.3 y tendencia -2.3, rural 53%, Occidente; 2.2: brecha 23 y tendencia +7.4; 0.5: brecha 29.5).
+- Limitaciones de las tablas: `top_entidades` muestra los estados mas poblados (Mexico, CDMX, Veracruz) en casi todos los microsegmentos; conviene un indice de sobrerrepresentacion. La tabla municipal ordenada por `pct_micro` muestra municipios muy chicos (20-50 personas) con 100% en un microsegmento; conviene filtrar por tamano.
+
+## Clases latentes (`08_clases_latentes.ipynb`)
+
+Ejecutado (~12 s).
+
+- Indicadores: cada eleccion federal en terciles ponderados (baja, media, alta), relativos a esa eleccion. `INCLUIR_PJ` agrega PJ 2025 como septimo indicador (por defecto no).
+- Celdas colapsadas a patrones unicos (maximo 729) con su peso; peso normalizado para sumar el numero de celdas.
+- EM propio (mezcla de categoricas con independencia local), 20 inicios, k de 2 a 8. Seleccion: menor BIC en 4-6 con clase minima >= 5%; se reportan AIC, entropia relativa y mejora del BIC.
+- Asignacion modal por celda con `prob_clase`; asignacion clara si prob >= 0.8.
+- Bootstrap de Poisson (5 replicas) y ARI contra base_04, candidato_1 (05), forma_1 (06) y perfil (07).
+- Salidas: `celdas_clases_latentes.parquet`, `lca_seleccion_k.csv`, `lca_clases.csv`.
+
+### Resultados
+- 728 de 729 patrones observados. Los mas comunes: siempre bajo (12.3% de personas) y siempre alto (11.3%).
+- BIC baja en todo el rango (mejora 1.1% de 3 a 4 clases, < 0.3% desde 7). Elegido k = 6 (menor BIC en 4-6, clase minima 8.7%). Entropia 0.77; 68.7% de personas con asignacion clara.
+- **Muy estable:** ARI bootstrap 0.99 (minimo 0.97).
+- Estructura nivel x forma emergente: los niveles medios se dividen por forma.
+
+| Clase | % pob | Prom | Brecha | Tend | % mujer | Edad dominante | Asignacion clara |
+|---|---|---|---|---|---|---|---|
+| 0 | 21.4 | 37.4 | 14.3 | +1.1 | 25 | 30-39 (87% < 40) | 92% |
+| 1 | 8.7 | 48.9 | 7.8 | -1.4 | 44 | 30-39 | 42% |
+| 2 | 18.2 | 50.5 | 18.7 | +3.0 | 53 | 30-39 | 60% |
+| 3 | 16.4 | 60.4 | 9.3 | -0.1 | 57 | 40-49 | 57% |
+| 4 | 11.8 | 62.1 | 19.5 | +4.5 | 68 | 40-49 | 50% |
+| 5 | 23.4 | 72.9 | 10.7 | +1.8 | 69 | 50-59 | 82% |
+
+- ARI vs base_04 0.34, vs ganador_05 0.38, vs forma_1 0.09, vs perfil del 07 0.27.
+
+## Subperfiles anidados (`09_subperfiles_anidados.ipynb`)
+
+Ejecutado (~20 s). Arbol de arriba hacia abajo: perfiles de origen configurable (`ORIGEN_PERFILES`, por defecto `"clases_latentes"`; alternativa `"base_04"`), renumerados por promedio, y KMeans ponderado dentro de cada perfil sobre A_base.
+
+- **Los perfiles de base_04 son solo moderadamente estables:** ARI bootstrap medio 0.74, minimo 0.50 (medido en este notebook con `ORIGEN_PERFILES = "base_04"`). Por eso el origen por defecto son las clases latentes (ARI 0.99).
+- Seleccion por perfil: mayor k con ARI >= 0.8 y subperfil minimo >= 2% de la poblacion. Con clases latentes: {0: 5, 1: 3, 2: 5, 3: 5, 4: 4, 5: 5} = 27 subperfiles (2.3% a 6.5% de la poblacion), ARI condicional 0.91-0.97. Con base_04 eran 18.
+- Subperfiles destacados (clases latentes): 1.1 (brecha 2.7, tendencia -3.5; Sonora indice 841, Colima 615); 3.5 (brecha 0.9, tendencia -3.0, 56% rural; Colima 889); 4.3 (brecha 21.7, tendencia +7.3; Tlaxcala 1029; dominante en 203 municipios); 2.1 (tendencia +6.5; Tlaxcala 966); 0.1 (promedio 33.2, 16% mujeres, 48% rural); 5.5 (promedio 76.5, brecha 1.9, 63% rural; dominante en 298 municipios).
+- Microtargeting: indice de sobrerrepresentacion por entidad (minimo 20k personas) y por persona-tipo sexo x edad; subperfil dominante en 2,158 municipios con al menos 1,000 personas.
+- ARI perfil vs base_04 0.34; vs perfil del 07 0.27.
+- Salidas: `celdas_subperfiles.parquet`, `subperfiles_resumen.csv`, `subperfiles_microtargeting.csv`, `subperfiles_entidades.csv`, `subperfiles_personas_tipo.csv`, `subperfiles_municipios.csv`.
+
 ## Entorno
 
 - **Gestor:** UV (reproducible con `uv sync`)
 - **Python:** 3.12 (fijado en `.python-version`; `uv sync` lo respeta aunque haya otras versiones instaladas)
-- **Dependencias:** pandas, numpy, matplotlib, seaborn, scikit-learn, jupyter, requests, tqdm, pyarrow, geopandas, folium
+- **Dependencias:** pandas, numpy, matplotlib, seaborn, scikit-learn, jupyter, requests, tqdm, pyarrow, geopandas, folium, python-dotenv, umap-learn
 
 ## Variables Sugeridas para Segmentacion
 
@@ -323,6 +424,13 @@ Geometrias simplificadas (tolerancia 0.008 municipal, 0.01 estatal). HTML ~24 MB
 - [x] Analisis exploratorio
 - [x] Segmentacion nacional ponderada (k=4, 71.2M personas) con caracterizacion completa
 - [x] Mapa nacional interactivo con 2 capas (estatal + municipal) y clustering local en 1,858 municipios
+- [x] Experimentos de clustering (2,028 configuraciones, estabilidad y finalistas)
+- [x] Experimentos de forma y embeddings (notebook 06)
+- [x] Segmentacion jerarquica macro/micro (notebook 07; inestable, ARI 0.33)
+- [x] Clases latentes (notebook 08; k=6, ARI 0.99)
+- [x] Subperfiles anidados en clases latentes (notebook 09; 6 perfiles, 27 subperfiles)
+- [ ] Confirmar clases latentes como segmentacion final y regenerar fichas y mapa (hoy basados en el notebook 04)
+- [ ] Elegir segmentacion final (niveles vs tipos de conducta)
 - [ ] Propuesta de estrategias
 - [ ] Documento tecnico
 - [ ] Fichas de perfil

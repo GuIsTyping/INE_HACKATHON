@@ -1,6 +1,40 @@
 # Bitacora de Cambios
 
+## 2026-10-25
+
+### Subperfiles sobre clases latentes
+- `notebooks/09_subperfiles_anidados.ipynb`: parametro `ORIGEN_PERFILES` (por defecto `"clases_latentes"`, alternativa `"base_04"`); reejecutado con las 6 clases latentes como perfiles: 27 subperfiles. Sobrescribe `celdas_subperfiles.parquet` y CSV `subperfiles_*`
+
+### Subperfiles anidados
+- `notebooks/09_subperfiles_anidados.ipynb`: arbol de arriba hacia abajo con los perfiles de base_04 y KMeans ponderado dentro de cada uno (18 subperfiles); indices de sobrerrepresentacion por entidad y persona-tipo, municipios con minimo de 1,000 personas. Genera `celdas_subperfiles.parquet` y CSV `subperfiles_*`
+- Medida por primera vez la estabilidad de base_04: ARI bootstrap 0.74
+
+### Ejecucion de clases latentes
+- `notebooks/08_clases_latentes.ipynb` ejecutado: k=6, ARI bootstrap 0.99. Genera `celdas_clases_latentes.parquet`, `lca_seleccion_k.csv`, `lca_clases.csv`
+
+### Clases latentes (sin ejecutar)
+- `notebooks/08_clases_latentes.ipynb`: LCA con EM propio sobre terciles ponderados de participacion por eleccion, seleccion de k por BIC, asignacion probabilistica, bootstrap y comparacion con modelos previos
+
+### Ejecucion de la segmentacion jerarquica
+- `notebooks/07_segmentacion_jerarquica.ipynb` ejecutado con A_base: 200 microsegmentos, 4 perfiles y 15 subperfiles; estabilidad baja (ARI 0.33). Genera `celdas_jerarquia.parquet` y los CSV `jerarquia_*`
+
 ## 2026-10-24
+
+### Segmentacion jerarquica (sin ejecutar)
+- `notebooks/07_segmentacion_jerarquica.ipynb`: microsegmentos con KMeans ponderado y arbol Ward ponderado sobre sus centros; tres niveles anidados (perfil, subperfil, microsegmento), bootstrap de Poisson, tabla de microtargeting y tabla territorial por municipio
+
+### Experimentos de forma y embeddings
+- `notebooks/06_experimentos_forma_embeddings.ipynb`: clustering sobre la forma de la trayectoria (sin nivel) y con UMAP y t-SNE como reduccion previa; 2,376 configuraciones evaluadas con lentes de nivel y forma
+- Dependencia `umap-learn` agregada con `uv add`
+
+### Experimentos de clustering
+- `notebooks/05_experimentos_clustering.ipynb`: busqueda en malla de 2,028 configuraciones (9 conjuntos de variables, 3 preprocesamientos, 7 algoritmos), estabilidad por bootstrap de 18 candidatas y reajuste de 3 finalistas con todos los datos frente al modelo del notebook 04
+- Genera `experimentos_clustering.csv`, `experimentos_estabilidad.csv`, `experimentos_finalistas.csv` y `celdas_perfiles_candidatos.parquet`; no modifica salidas del notebook 04
+- Regenerados localmente `celdas_historial.parquet` y `secciones_historial.parquet` ejecutando el notebook 03 (sin cambiar el archivo versionado)
+
+### Limpieza de outputs del notebook 04
+- `04_segmentacion.ipynb`: eliminado el output del mapa folium embebido (53.7 MB) y la linea `m` que lo desplegaba; el mapa se consulta desde `mapa_nacional_segmentacion.html`. El notebook pasa de 56.4 MB a ~1.3 MB y conserva el resto de outputs (graficas, tablas)
+- `02_perfilado_datos.ipynb` y `03_analisis_exploratorio.ipynb`: corregida la version invalida `3.12.-1` en metadatos a `3.12`
 
 ### Nombres auto-generados y layout del mapa
 - `generar_nombre_perfil()`: funcion que compone nombres descriptivos a partir de condiciones sobre edad, genero, tipo de asentamiento y comportamiento electoral (sin nombres hardcodeados)
