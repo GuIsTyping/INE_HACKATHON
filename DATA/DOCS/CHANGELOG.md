@@ -2,6 +2,9 @@
 
 ## 2026-10-25
 
+### Rasgos demograficos en los descriptores
+- `11_fichas_y_mapa.ipynb`: el descriptor de cada perfil agrega edad, sexo, rural y region solo cuando destacan frente al nacional (`UMBRAL_INDICE = 1.4`, `UMBRAL_SEXO = 60`); acentos en los textos visibles. Reejecutado
+
 ### Nombres definitivos de los perfiles
 - `11_fichas_y_mapa.ipynb`: `NOMBRES` fijados (Por convencer, Constancia que se apaga, Generación en ascenso, Paso firme, Voces que avanzan, Pilar democrático); los nombres automaticos pasan a `DESCRIPTORES` y se muestran como subtitulo en fichas, panel del mapa y `fichas_resumen_perfiles.csv`. Reejecutado
 
