@@ -3,6 +3,8 @@
 **Reto 1: Perfiles ciudadanos de participación**
 Hackea la participación: Datos que construyen democracia | INE, 2026
 
+**Autores:** Ángel David Durazo Bartolini y Jehú Jonathan Ramírez Ramírez
+
 ---
 
 ## 1. Introducción

@@ -1,5 +1,7 @@
 # Estrategias diferenciadas de fomento a la participación
 
+**Autores:** Ángel David Durazo Bartolini y Jehú Jonathan Ramírez Ramírez
+
 Propuesta de intervención por perfil, basada en las características identificadas por la
 segmentación (conducta electoral 2009-2024) y los descriptores sociodemográficos y territoriales.
 
