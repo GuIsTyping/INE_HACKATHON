@@ -32,9 +32,17 @@ Participar en el **Reto 1: Perfiles ciudadanos de participación** (Eje: Segment
 2. ~~Caracterizar cada grupo~~ (completado: edad, sexo, escolaridad, internet, región, historial)
 3. ~~Nombrar y describir cada perfil~~ (completado: fichas PNG/PDF, mapa interactivo)
 4. ~~Proponer estrategias diferenciadas~~ (completado: `DATA/DOCS/estrategias_por_perfil.md`)
-5. ~~Documento técnico~~ (completado: `DATA/DOCS/documento_tecnico.pdf`, 8 páginas, Calibri 11, interlineado 1.5)
+5. ~~Documento técnico~~ (contenido completo en `DATA/DOCS/documento_tecnico.md`, ~10 cuartillas estimadas en Arial 11). El PDF (Calibri 11, interlineado 1.5) se genera fuera del repositorio y debe regenerarse desde el .md actual; verificar que quede en 8-12 cuartillas
 6. ~~Presentación ejecutiva~~ (completado: `DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
 7. Cartas firmadas (cesión de derechos + declaratoria) — pendiente (requiere firma del equipo)
+
+### Criterios de redacción de los entregables
+- Audiencia: personal del INE que conoce a fondo los datos electorales pero no necesariamente métodos de agrupamiento. Lenguaje electoral experto, estadística traducida.
+- Cada medida técnica (ARI, BIC, silhouette, asignación clara, varianza explicada) aparece con su interpretación en lenguaje llano; el documento técnico tiene una tabla "Cómo leer las cifras" (3.1), una de decisiones de partida (3.2) y una de métodos probados y descartados (3.3).
+- Escolaridad, internet e ISSSTE se redactan como características de la sección ("vive en secciones de mayor escolaridad"), no de las personas.
+- Barreras de cada perfil se presentan como hipótesis ("barrera probable") a validar con pilotos; mensajes institucionales y no partidistas.
+- Se evita "microtargeting" (se usa "focalización territorial"), predicciones categóricas ("migrarán") y afirmaciones causales no demostradas.
+- Diapositiva 4 de la presentación: metodología en cuatro tarjetas (probamos, aprendimos, elegimos, confiabilidad) y gráfica de participación por elección de P1 contra P2 (mismo promedio, trayectorias opuestas). Trayectorias ponderadas por perfil: P1 48.5, 58.5, 46.1, 51.2, 39.7, 47.2; P2 35.6, 58.9, 39.5, 62.2, 48.7, 58.0 (2009-2024).
 
 ## Criterios de Evaluación (100 pts)
 

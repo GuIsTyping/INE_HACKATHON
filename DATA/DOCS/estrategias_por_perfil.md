@@ -5,6 +5,11 @@
 Propuesta de intervención por perfil, basada en las características identificadas por la
 segmentación (conducta electoral 2009-2024) y los descriptores sociodemográficos y territoriales.
 
+El CCPC registra si una persona votó, no por qué. Las barreras son hipótesis derivadas del patrón
+observado y se proponen para validarse con pilotos en los territorios prioritarios. La escolaridad
+y el internet son promedios de la sección donde vive cada perfil, no datos individuales. Todos los
+mensajes son institucionales y no partidistas.
+
 ---
 
 ## P0: Por convencer (15.3M personas, 21.4%)
@@ -15,9 +20,9 @@ segmentación (conducta electoral 2009-2024) y los descriptores sociodemográfic
 51% de viviendas con internet. Responde algo más a elecciones presidenciales (brecha +14.3)
 y muestra una tendencia ligeramente ascendente (+1.1).
 
-**Barrera principal.** La participación electoral no es una prioridad, no forma parte de su identidad
-  ni de su rutina. Al ser en su mayoría hombres jóvenes en zonas urbanas del norte, la oferta institucional
-  tradicional no les resulta atractiva.
+**Barrera probable.** La participación electoral no es una prioridad, no forma parte de su identidad
+  ni de su rutina. Al ser en su mayoría hombres jóvenes en zonas urbanas del norte, es probable que la
+  oferta institucional tradicional no les resulte atractiva.
 
 **Estrategia: acercamiento por relevancia, no por obligación.**
 
@@ -43,15 +48,15 @@ y muestra una tendencia ligeramente ascendente (+1.1).
 **Diagnóstico.** Participación de 48.5%, estable entre tipos de elección (brecha 7.6, la más baja)
 pero en descenso sostenido (-1.6 por elección). Es el único perfil con tendencia negativa clara.
 Composición mixta en género (44% mujeres), edad dominante 30-39, fuerte en el Occidente
-(Jalisco, Guanajuato, Colima). La menor escolaridad promedio (9.1 grados), menor % con
-educación posbásica (38%) y menor acceso a internet (49%). Asignación poco clara (solo 44%
-con probabilidad >= 0.8): es un perfil de transición, cuyos integrantes podrían derivar hacia P0
-o recuperarse.
+(Jalisco, Guanajuato, Colima). Vive en las secciones con menor escolaridad promedio (9.1 grados),
+menor % con educación posbásica (38%) y menor acceso a internet (49%). Solo 44% de sus
+integrantes pertenece claramente al perfil; el resto se parece también a un perfil vecino. Es una
+población en transición que podría derivar hacia P0 o recuperarse.
 
-**Barrera principal.** Desencanto progresivo. Estas personas participaban pero están dejando de
-hacerlo. La baja claridad del modelo sugiere que están en una zona gris conductual.
+**Barrera probable.** Desencanto progresivo. Estas personas participaban pero están dejando de
+hacerlo. Su asignación poco clara sugiere que están entre dos comportamientos.
 
-**Estrategia: reactivación antes de que sea tarde.**
+**Estrategia: reactivación temprana.**
 
 - **Mensaje.** Reconocer su participación pasada ("tu voto siempre contó") y mostrar
   resultados tangibles de procesos electorales recientes en su región. Combatir la percepción
@@ -59,7 +64,7 @@ hacerlo. La baja claridad del modelo sugiere que están en una zona gris conduct
 - **Canal.** Medios tradicionales y comunitarios: radio local, presencia en eventos
   comunitarios. El acceso a internet es el más bajo (49%), por lo que la estrategia digital
   es complementaria, no central.
-- **Momento.** Intervención continua por fuera de periodos electoral. Programas de vinculación
+- **Momento.** Intervención continua, también fuera de los periodos electorales. Programas de vinculación
   cívica permanente en las regiones donde se concentra.
 - **Territorio.** Occidente: Jalisco, Guanajuato, Colima (índices de sobrerrepresentación más
   altos). Subperfil 1.1 (en caída de -3.8 por elección) en Sonora y Colima como caso crítico.
@@ -72,11 +77,11 @@ hacerlo. La baja claridad del modelo sugiere que están en una zona gris conduct
 
 **Diagnóstico.** Participación media de 50.5% con la mayor brecha presidencial después de P4
 (+18.4) y tendencia fuertemente ascendente (+3.0). Perfil joven (66% menor de 40, dominante
-30-39), equilibrado en género (53% mujeres), predominantemente urbano (76%). La mayor
-escolaridad urbana (10.6 grados) y el mayor acceso a internet (55%). Se moviliza en
+30-39), equilibrado en género (53% mujeres), predominantemente urbano (76%). En zonas
+urbanas vive en secciones de escolaridad alta (10.6 grados) y tiene el mayor acceso a internet (55%). Se moviliza en
 presidenciales pero cae en intermedias.
 
-**Barrera principal.** Participación selectiva. Este grupo responde a la "emoción" de la elección
+**Barrera probable.** Participación selectiva. Este grupo responde a la "emoción" de la elección
 presidencial pero no percibe las intermedias como relevantes.
 
 **Estrategia: sostener el impulso entre elecciones.**
@@ -104,7 +109,7 @@ tendencia (+/-0.1). Perfil adulto (dominante 40-49, 66% mayor de 40), mayoría m
 fuerte en Occidente (Jalisco, Guanajuato). Escolaridad 9.6 grados, 52% internet. Es el perfil
 más predecible: participa de forma consistente sin importar el tipo de elección.
 
-**Barrera principal.** Ninguna barrera crítica. El riesgo es la complacencia institucional: dar
+**Barrera probable.** Ninguna barrera crítica. El riesgo es la complacencia institucional: dar
 por sentado a este grupo y no invertir en mantener su compromiso. El subperfil 3.5 (brecha
 0.7, tendencia -3.1, 57% rural, concentrado en Colima) muestra que partes del grupo están
 empezando a declinar.
@@ -129,11 +134,11 @@ empezando a declinar.
 
 **Diagnóstico.** Participación de 62.0% con la mayor brecha presidencial (+19.5) y la tendencia
 ascendente más pronunciada de todos los perfiles (+4.5 por elección). Perfil de mayoría
-femenina (68%), adulto (dominante 40-49), con la mayor escolaridad (10.1 grados, 50%
-posbásica) y mayor afiliación al ISSSTE (7.9%, el doble del P1). Se moviliza masivamente
+femenina (68%), adulto (dominante 40-49). Vive en las secciones de mayor escolaridad (10.1 grados,
+50% posbásica) y mayor afiliación al ISSSTE (7.9%, el doble del P1). Se moviliza masivamente
 en presidenciales y crece de elección en elección.
 
-**Barrera principal.** Similar a P2: brecha entre presidenciales e intermedias. Pero este grupo
+**Barrera probable.** Similar a P2: brecha entre presidenciales e intermedias. Pero este grupo
 ya tiene alta participación base, así que la oportunidad es convertir su energía en liderazgo
 cívico más que en simple asistencia a las urnas.
 
@@ -164,7 +169,7 @@ escolaridad (11.0). Menor acceso a internet (49%). Las secciones con presencia i
 (40%+) participan más que el promedio nacional (63.1 vs 55.1) y se concentran en este perfil
 (13.2% vive en secciones indígenas, contra 7.1% nacional).
 
-**Barrera principal.** Envejecimiento y accesibilidad. Este grupo es el pilar de la participación
+**Barrera probable.** Envejecimiento y accesibilidad. Este grupo es el pilar de la participación
 pero su edad avanzada plantea retos de movilidad, salud y eventualmente reemplazo
 generacional. En zonas rurales, las distancias a casillas pueden ser una barrera física.
 
@@ -192,7 +197,7 @@ generacional. En zonas rurales, las distancias a casillas pueden ser una barrera
 | Perfil | Prioridad INE | Objetivo | Canal principal | Territorio |
 |---|---|---|---|---|
 | P0 Por convencer | Muy alta | Incorporar | Digital + presencial urbano | Noroeste |
-| P1 Constancia que se apaga | Alta (urgente) | Reactivar | Medios tradicionales, comunidad | Occidente |
+| P1 Constancia que se apaga | Alta (temprana) | Reactivar | Medios tradicionales, comunidad | Occidente |
 | P2 Generación en ascenso | Alta | Sostener en intermedias | Digital | Nacional urbano |
 | P3 Paso firme | Media | Mantener y multiplicar | Mixto | Occidente |
 | P4 Voces que avanzan | Media-alta | Canalizar liderazgo | Digital + redes de mujeres | Nacional |
@@ -212,7 +217,7 @@ generacional. En zonas rurales, las distancias a casillas pueden ser una barrera
    perfiles suman 52% de la población analizada y su participación en intermedias está 14-20
    puntos por debajo de su nivel en presidenciales.
 
-4. **P1 es la alerta roja.** Es el único perfil en descenso sostenido y el de menor claridad en la
+4. **P1 es la señal de alerta.** Es el único perfil en descenso sostenido y el de menor claridad en la
    asignación del modelo, lo que sugiere una población en transición que puede derivar hacia la
    no participación si no se interviene.
 

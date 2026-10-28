@@ -11,7 +11,7 @@ Hackea la participación: Datos que construyen democracia | INE, 2026
 
 La participación electoral en México muestra patrones persistentes y diferenciados. Mientras que las elecciones presidenciales alcanzan tasas cercanas al 60%, las intermedias apenas superan el 47%, y esta brecha no afecta por igual a todos los segmentos de la población. El propósito de este documento es identificar y caracterizar perfiles ciudadanos de participación a partir de los registros del sistema de Conteos Censales de Participación Ciudadana (CCPC) del INE, abarcando seis elecciones federales (2009-2024) y la elección extraordinaria del Poder Judicial (2025).
 
-El objetivo práctico es doble: primero, ofrecer al INE una tipología empírica de comportamientos electorales que trascienda la descripción demográfica convencional (edad, sexo, región); segundo, derivar estrategias diferenciadas de fomento a la participación que reconozcan las barreras y oportunidades específicas de cada perfil.
+El objetivo práctico es doble: primero, ofrecer al INE una tipología de comportamientos electorales que vaya más allá de la descripción demográfica convencional (edad, sexo, región); segundo, derivar estrategias diferenciadas de fomento a la participación que reconozcan las barreras y oportunidades específicas de cada perfil.
 
 La unidad de análisis es la celda sociodemográfica (sección electoral x sexo x grupo de edad), la más fina disponible en el CCPC sin comprometer el anonimato. El universo comprende 657,497 celdas que representan a 71.2 millones de personas en la lista nominal de 2024.
 
@@ -26,184 +26,219 @@ La unidad de análisis es la celda sociodemográfica (sección electoral x sexo 
 | ECEG 2020 (INEGI-INE) | Censo 2020 | 68,806 secciones | Escolaridad e internet por sección |
 | Marco geoestadístico | 2022 | 2,475 municipios | Cartografía para mapas |
 
-Cada celda tiene tasa de participación calculada como SV / (SV + NV) para cada elección, excluyendo los registros no especificados (NS) que corresponden a cuadernillos no disponibles. Se retienen únicamente celdas con al menos 20 votantes potenciales en las seis elecciones federales, garantizando estimaciones estables.
+Cada celda tiene una tasa de participación por elección, calculada como SV / (SV + NV): personas que votaron entre personas registradas con dato. Se excluyen los registros no especificados (NS), que corresponden a cuadernillos no disponibles.
 
 ### 2.2 Indicadores de comportamiento
 
-Para cada celda se calcularon cuatro indicadores sintéticos:
+Para describir el historial de cada celda usamos cuatro indicadores:
 
-- **Promedio:** media aritmética de las seis tasas (nivel general de participación).
-- **Desviación:** desviación estándar de las seis tasas (estabilidad entre elecciones).
-- **Brecha presidencial:** promedio en presidenciales (2012, 2018, 2024) menos promedio en intermedias (2009, 2015, 2021). Mide la sensibilidad al tipo de elección.
-- **Tendencia:** pendiente de la regresión lineal de las tasas sobre el tiempo, en puntos porcentuales por elección. Mide la dirección del cambio.
+- **Participación media:** promedio de las seis tasas. Responde a *cuánto* vota la celda.
+- **Variabilidad:** desviación estándar de las seis tasas. Responde a *qué tan parejo* vota.
+- **Extra en presidenciales (brecha):** promedio en presidenciales (2012, 2018, 2024) menos promedio en intermedias (2009, 2015, 2021), en puntos porcentuales. Una brecha de +18 significa que, en promedio, la celda vota 18 puntos más cuando se elige presidente.
+- **Tendencia:** cuántos puntos gana o pierde la celda en cada elección, en promedio (pendiente de una recta ajustada a las seis tasas). Una tendencia de +4.5 equivale a unos 22 puntos más entre 2009 y 2024.
 
 ## 3. Metodología
 
-### 3.1 Elección del método
+La pregunta del reto es qué tipos de ciudadanía existen según su comportamiento de participación. Para responderla buscamos grupos de celdas con historiales de votación parecidos entre 2009 y 2024. Esta sección explica qué decisiones tomamos, qué probamos antes de llegar al método final y por qué elegimos un modelo de clases latentes.
 
-Se evaluaron sistemáticamente más de 2,000 configuraciones de clustering (K-Means, Bisecting K-Means, Birch, GMM, aglomerativo, espectral, HDBSCAN) sobre nueve conjuntos de variables con tres preprocesamientos, además de 2,376 configuraciones con embeddings (UMAP, t-SNE) y variables de forma. La evaluación consideró silhouette, R-cuadrada del promedio, estabilidad por bootstrap y separación en un espacio de referencia común.
+### 3.1 Cómo leer las cifras de este documento
 
-Los métodos clásicos de clustering tienden a segmentar por nivel de participación (particiones con R-cuadrada de 0.90 para el promedio pero 0.04 para la forma de la trayectoria), lo que produce grupos "alto/medio/bajo" sin distinguir patrones conductuales como la brecha presidencial o la tendencia temporal. La segmentación jerárquica resultó inestable (ARI bootstrap 0.33).
+Usamos pocas medidas estadísticas y todas responden a una pregunta concreta:
 
-### 3.2 Análisis de Clases Latentes (LCA)
+| Medida | Pregunta que responde | Cómo interpretarla |
+|---|---|---|
+| Estabilidad (ARI por remuestreo) | Si repetimos el análisis con otra muestra de los datos, ¿salen los mismos perfiles? | Va de 0 (coincidencia al azar) a 1 (idénticos). Arriba de 0.8 se considera estable. |
+| Asignación clara | ¿Qué tan seguro está el modelo de que una persona pertenece a su perfil? | Porcentaje de personas con probabilidad de 0.8 o más de pertenecer a su perfil. |
+| Separación (silhouette) | ¿Los grupos están separados por fronteras nítidas? | Va de -1 a 1. Valores bajos indican un continuo sin cortes naturales. |
+| BIC | ¿Cuántos grupos conviene usar? | Premia que el modelo explique bien los datos y penaliza agregar grupos innecesarios. Menor es mejor. |
+| Varianza explicada | ¿Qué parte de las diferencias entre celdas en un indicador se debe al perfil? | Va de 0 a 1. Un valor de 0.90 significa que conocer el perfil explica el 90% de las diferencias. |
 
-Se optó por un modelo de clases latentes propio, implementado como una mezcla de distribuciones categóricas con independencia local estimada por Esperanza-Maximización (EM). Cada elección federal se discretizó en terciles ponderados (baja, media, alta participación) relativos a esa elección, generando un patrón de seis indicadores ordinales por celda.
+### 3.2 Decisiones de partida
 
-Este enfoque tiene tres ventajas sobre el clustering convencional:
+| Decisión | Qué elegimos | Por qué |
+|---|---|---|
+| Unidad de análisis | Celda sección x sexo x grupo de edad | Es el nivel más fino que ofrece el CCPC sin identificar personas. |
+| Tamaño mínimo | Al menos 20 personas registradas en cada una de las seis elecciones | En celdas más chicas, que voten una o dos personas más mueve demasiado la tasa. |
+| Variables para formar los perfiles | Solo la conducta electoral 2009-2024 | Queremos perfiles de *participación*. La demografía se usa después para describirlos (ver 3.3). |
+| Poder Judicial 2025 | Descriptor, no variable de segmentación | Es un fenómeno distinto: su relación con el voto federal es débil (correlación de 0.28). |
+| Ponderación | Cada celda pesa según su número de personas | Para que una celda de 300 personas cuente más que una de 25. |
 
-1. **Asignación probabilística.** Cada celda recibe una probabilidad de pertenencia a cada clase, lo que permite medir la certeza de la clasificación (entropía relativa: 0.78; 69% de las celdas con probabilidad >= 0.80 en su clase asignada).
-2. **Equilibrio nivel-forma.** A diferencia del clustering sobre tasas continuas, la discretización en terciles por elección normaliza el nivel y permite que la estructura del modelo capture tanto diferencias en participación como en patrón temporal.
-3. **Estabilidad.** ARI bootstrap medio de 0.98 (mínimo 0.95 en 5 réplicas de Poisson), muy superior al clustering jerárquico (0.33) y comparable al mejor K-Means (0.93-0.98), pero con la ventaja de la asignación probabilística.
+### 3.3 Qué probamos antes de llegar al método final
 
-Se exploraron modelos de 2 a 8 clases con 20 inicializaciones aleatorias cada uno, seleccionando k = 6 por tener el menor BIC en el rango de 4 a 6 clases con un tamaño mínimo de clase >= 5%. La elección extraordinaria del Poder Judicial 2025 no se incluyó como variable de segmentación por representar una dimensión distinta (correlación 0.28 con el promedio federal); se usa como descriptor.
+No partimos de un método preestablecido: evaluamos más de 4,400 variantes que combinan algoritmos de agrupamiento, conjuntos de variables y formas de preparar los datos. La tabla resume lo que aprendimos.
 
-### 3.3 Subperfiles
+| Qué probamos | Qué encontramos | Decisión |
+|---|---|---|
+| Agrupamiento clásico sobre las seis tasas (K-Means, Bisecting K-Means, mezclas gaussianas) | Grupos estables (0.93 a 0.98), pero que solo ordenan por nivel: votan poco, regular, mucho o muchísimo. El perfil explica 90% de las diferencias en participación media y apenas 4% de las diferencias en el patrón temporal. | Descartado: no distingue a quien vota parejo de quien solo vota en presidenciales. |
+| Agrupamiento sobre los indicadores (media, brecha, tendencia) | Sí distingue tipos de conducta, pero los grupos cambian al repetir el análisis (estabilidad media 0.74; en algún remuestreo, 0.50). | Descartado por inestable. |
+| Agrupamiento sobre la forma de la trayectoria (cada tasa menos el promedio de la celda) | Grupos estables (0.95) con patrones temporales claros, pero ignora el nivel: el perfil explica solo 8% de las diferencias en participación media. | Descartado: pierde la dimensión de cuánto vota la gente. |
+| Agregar edad, sexo, tipo de sección o región como variables | Los grupos se separan por sexo en lugar de por conducta. En un caso, cada grupo quedó compuesto por un solo sexo. | Descartado: la demografía se usa solo como descriptor. |
+| Jerárquico (Ward), Birch, espectral, por densidad (HDBSCAN), reducción previa con UMAP o t-SNE | Grupos inestables (Ward: 0.33; UMAP y t-SNE: 0.38 a 0.67), un grupo gigante con otros diminutos, o ningún grupo denso. | Descartados. |
 
-Dentro de cada clase latente se aplicó K-Means ponderado sobre los tres indicadores conductuales (promedio, brecha, tendencia) para identificar subperfiles. El número de subperfiles por clase se seleccionó como el mayor k con ARI condicional >= 0.80 y tamaño mínimo >= 2% de la población total, resultando en 27 subperfiles (3 a 5 por clase).
+**El hallazgo que cambió el enfoque.** Los experimentos mostraron que *cuánto* vota una celda y *cómo* vota (pareja entre elecciones o solo en presidenciales, al alza o a la baja) son dos dimensiones casi independientes. La coincidencia entre una segmentación por nivel y otra por forma fue de 0.03, prácticamente la que daría el azar. Esto importa para el INE porque dos poblaciones con la misma participación media pueden necesitar estrategias opuestas. El perfil P1 de este documento vota en promedio 48.5% y viene a la baja; el P2 vota 50.5%, pero partió de 36% en 2009 y llegó a 58% en 2024, con saltos de más de 20 puntos en las presidenciales de 2012 y 2018. Un agrupamiento por nivel los habría puesto en el mismo grupo.
 
-### 3.4 Descriptores sociodemográficos
+También aprendimos que la participación es un continuo: la mejor separación lograda fue de 0.31, lo que indica que no existen fronteras naturales entre grupos. Los perfiles funcionan como las tallas de ropa: no hay un salto natural entre una M y una L, pero distinguirlas es útil para atender a cada quien.
 
-Los perfiles se caracterizan post-hoc por:
-- **Variables del CCPC:** edad (8 grupos), sexo, tipo de sección (urbana/mixta/rural), entidad federativa y región.
-- **ECEG 2020 (INEGI-INE):** grado promedio de escolaridad por sección y sexo, porcentaje con educación posbásica, porcentaje de viviendas con internet.
-- **Índices de sobrerrepresentación** por entidad: (% de la población del perfil en la entidad) / (% de la población nacional en esa entidad) x 1000, para identificar territorios prioritarios.
+### 3.4 El método elegido: análisis de clases latentes
 
-Se probó sistemáticamente la inclusión de 118 indicadores censales de la ECEG en el modelo de clases latentes. Ninguno mejoró sustancialmente la segmentación (ARI >= 0.80 en todas las variantes) ni logró distinguir perfiles mejor que la edad o el sexo del CCPC (eta cuadrada máxima de 0.08 vs 0.29 de la edad). La decisión fue mantener la segmentación basada exclusivamente en conducta electoral y usar las variables censales como descriptores.
+Necesitábamos un método que capturara nivel y forma a la vez, que fuera estable y que indicara qué tan segura es cada asignación. El análisis de clases latentes cumple las tres condiciones.
+
+**Paso 1: cada elección se clasifica como baja, media o alta.** En cada elección ordenamos las celdas por su tasa de participación y las dividimos en tres tercios (ponderados por población): el tercio que menos votó, el intermedio y el que más votó. La clasificación es relativa a cada elección. Así, una celda con 55% en 2018 (año de participación alta en todo el país) puede quedar en el tercio medio, y la misma tasa en 2015 la pondría en el alto. Con esto, la forma de la trayectoria pesa tanto como el nivel, sin que los años de alta participación general dominen el resultado.
+
+**Paso 2: el modelo busca los patrones que más se repiten.** Cada celda queda descrita por seis etiquetas (por ejemplo: baja, media, baja, alta, media, alta). El modelo supone que detrás de esas combinaciones hay unos cuantos tipos de ciudadanía, cada uno con su propia probabilidad de quedar en el tercio bajo, medio o alto en cada elección, y estima esos tipos con el algoritmo de Esperanza-Maximización (EM), que implementamos nosotros. Para no depender del punto de partida, cada modelo se estimó 20 veces desde inicios aleatorios distintos y se conservó la mejor solución.
+
+**Paso 3: cada celda recibe una probabilidad de pertenecer a cada perfil.** A diferencia de los métodos clásicos, que asignan cada celda a un grupo sin matices, aquí sabemos qué tan segura es la asignación. Esto permite identificar poblaciones en transición, como el perfil P1.
+
+**¿Por qué seis perfiles?** Estimamos modelos de 2 a 8 perfiles. El BIC mejora siempre al agregar perfiles, pero cada vez menos: pasar de 5 a 6 perfiles mejora el ajuste 0.78%, mientras que pasar de 6 a 7 lo mejora solo 0.28%, menos de la mitad. Además, la convocatoria pide de 4 a 6 perfiles y con seis todos conservan un tamaño útil para una campaña (el más chico agrupa al 8.3% de la población).
+
+**¿Qué tan confiables son los perfiles?**
+
+- **Estabilidad:** repetimos el modelo cinco veces sobre versiones remuestreadas de los datos. Los perfiles salieron prácticamente idénticos: coincidencia media de 0.98 y mínima de 0.95. Está al nivel de los métodos más estables evaluados, con la ventaja de capturar nivel y forma.
+- **Claridad:** 69% de las personas pertenece a su perfil con probabilidad de 0.8 o más. El resto se parece a dos perfiles a la vez, algo esperable en un continuo.
+
+### 3.5 Subperfiles
+
+Dentro de cada perfil aplicamos un segundo agrupamiento (K-Means ponderado) sobre la participación media, la brecha y la tendencia para distinguir variantes más finas. En cada perfil elegimos el mayor número de subperfiles que cumpliera dos condiciones: que se mantuvieran estables al repetir el análisis (0.80 o más) y que cada uno representara al menos 2% de la población total. El resultado son 27 subperfiles, de 3 a 5 por perfil, útiles para la focalización territorial.
+
+### 3.6 Descriptores sociodemográficos
+
+Una vez formados los perfiles, los describimos con:
+
+- **Variables del CCPC:** edad (8 grupos), sexo, tipo de sección (urbana, mixta o rural), entidad federativa y región.
+- **ECEG 2020 (INEGI-INE):** grado promedio de escolaridad por sección y sexo, porcentaje con educación posbásica y porcentaje de viviendas con internet.
+- **Índice de sobrerrepresentación por entidad:** (% de la población del perfil que vive en la entidad) / (% de la población nacional que vive en ella) x 1000. Un índice de 1,000 indica una presencia proporcional; uno de 1,500, una presencia 50% mayor a la esperada.
+
+También probamos incluir 118 indicadores del censo como variables del modelo. Ninguno cambió de forma importante los perfiles (coincidencia de 0.80 o más con el modelo original en todas las variantes) ni se diferencia entre perfiles tanto como la edad: el perfil explica como máximo 8% de las diferencias en un indicador censal, contra 29% en la edad. Por eso los perfiles se forman solo con conducta electoral y las variables censales se usan para describirlos.
 
 ## 4. Resultados: seis perfiles ciudadanos
 
-La siguiente tabla resume los seis perfiles identificados. Las cifras de población corresponden a la lista nominal de 2024.
+La siguiente tabla resume los seis perfiles. Las cifras de población corresponden a la lista nominal de 2024.
 
-| # | Nombre | Población | % | Prom | Brecha | Tendencia | % Mujer | Edad dom. |
-|---|---|---|---|---|---|---|---|---|
-| 0 | Por convencer | 15.3M | 21.4 | 37.3 | +14.3 | +1.1 | 25 | 30-39 |
-| 1 | Constancia que se apaga | 5.9M | 8.3 | 48.5 | +7.6 | -1.6 | 44 | 30-39 |
-| 2 | Generación en ascenso | 13.3M | 18.6 | 50.5 | +18.4 | +3.0 | 53 | 30-39 |
-| 3 | Paso firme | 11.6M | 16.3 | 60.3 | +9.3 | -0.1 | 57 | 40-49 |
-| 4 | Voces que avanzan | 8.4M | 11.8 | 62.0 | +19.5 | +4.5 | 68 | 40-49 |
-| 5 | Pilar democrático | 16.7M | 23.5 | 72.8 | +10.6 | +1.8 | 69 | 50-59 |
-
-*Prom: participación media 2009-2024 (%); Brecha: diferencia presidencial - intermedia (pp); Tendencia: cambio por elección (pp); Edad dom.: grupo de edad con mayor peso.*
+| # | Nombre | Población | % | Participación media (%) | Extra en presidenciales (pts) | Cambio por elección (pts) | % mujeres | Edad predominante | Asignación clara (%) |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | Por convencer | 15.3M | 21.4 | 37.3 | +14.3 | +1.1 | 25 | 30-39 | 92 |
+| 1 | Constancia que se apaga | 5.9M | 8.3 | 48.5 | +7.6 | -1.6 | 44 | 30-39 | 44 |
+| 2 | Generación en ascenso | 13.3M | 18.6 | 50.5 | +18.4 | +3.0 | 53 | 30-39 | 59 |
+| 3 | Paso firme | 11.6M | 16.3 | 60.3 | +9.3 | -0.1 | 57 | 40-49 | 57 |
+| 4 | Voces que avanzan | 8.4M | 11.8 | 62.0 | +19.5 | +4.5 | 68 | 40-49 | 51 |
+| 5 | Pilar democrático | 16.7M | 23.5 | 72.8 | +10.6 | +1.8 | 69 | 50-59 | 82 |
 
 ### 4.1 Descripción de los perfiles
 
-**P0 - Por convencer (15.3M, 21.4%).** La participación más baja (37.3%). Mayoritariamente masculino (75%) y joven (87% menor de 40 años). Concentrado en el Noroeste (Baja California, Sonora, Chihuahua). Escolaridad media de 9.3 grados, 51% con internet. Responde parcialmente a elecciones presidenciales pero su tendencia es apenas positiva. Es el perfil de la desvinculación: no rechaza la democracia, simplemente no participa en ella.
+**P0 - Por convencer (15.3M, 21.4%).** La participación más baja (37.3%). Mayoritariamente masculino (75%) y joven (87% menor de 40 años). Concentrado en el Noroeste (Baja California, Sonora, Chihuahua). Vive en secciones con escolaridad media de 9.3 grados y 51% de viviendas con internet. Vota algo más en presidenciales y su tendencia es apenas positiva. Es el perfil más claramente definido: 92% de sus integrantes pertenece a él sin ambigüedad. Es el grupo más alejado de las urnas en todas las elecciones.
 
-**P1 - Constancia que se apaga (5.9M, 8.3%).** Participación intermedia (48.5%) con la brecha presidencial más baja (7.6 puntos: participa de manera estable sin importar el tipo de elección) pero en descenso sostenido (-1.6 por elección), siendo el único perfil con tendencia negativa. Escolaridad y acceso a internet más bajos (9.1 grados, 49%). Concentrado en Occidente (Jalisco, Guanajuato, Colima). Es la alerta del sistema: ciudadanos que participaban pero están dejando de hacerlo. La baja certeza de su asignación (solo 44% con probabilidad >= 0.80) sugiere una población en transición.
+**P1 - Constancia que se apaga (5.9M, 8.3%).** Participación intermedia (48.5%) y la brecha presidencial más baja (7.6 puntos): vota de manera pareja sin importar el tipo de elección. Pero viene en descenso (-1.6 puntos por elección) y es el único perfil con tendencia negativa. Vive en las secciones con menor escolaridad y acceso a internet (9.1 grados, 49%). Concentrado en Occidente (Jalisco, Guanajuato, Colima). Solo 44% de sus integrantes pertenece claramente a este perfil; el resto se parece también a otro perfil vecino, lo que es coherente con una población en transición.
 
-**P2 - Generación en ascenso (13.3M, 18.6%).** Participación media (50.5%) con una marcada brecha presidencial (+18.4) y la segunda tendencia ascendente más alta (+3.0). Joven (66% menor de 40), equilibrado en género, predominantemente urbano (76%). La mayor escolaridad en zonas urbanas (10.6 grados) y el mayor acceso a internet (55%). Se moviliza en elecciones presidenciales pero se ausenta en las intermedias.
+**P2 - Generación en ascenso (13.3M, 18.6%).** Participación media (50.5%) con una brecha presidencial marcada (+18.4) y la segunda tendencia ascendente más alta (+3.0): pasó de 36% en 2009 a 58% en 2024. Joven (66% menor de 40), equilibrado en género y predominantemente urbano (76%). En zonas urbanas vive en secciones con escolaridad alta (10.6 grados) y tiene el mayor acceso a internet (55%). Se moviliza en elecciones presidenciales pero se ausenta en las intermedias.
 
-**P3 - Paso firme (11.6M, 16.3%).** Participación de 60.3%, la más estable de todos los perfiles (brecha 9.3, tendencia -0.1). Adultos de 40-49, 57% mujeres, fuerte en Occidente. Es el perfil del votante consistente: participa sin importar el tipo de elección y no muestra cambio en el tiempo.
+**P3 - Paso firme (11.6M, 16.3%).** Participación de 60.3% y el patrón más estable de todos (brecha 9.3, tendencia -0.1). Adultos de 40-49 años, 57% mujeres, con fuerte presencia en Occidente. Es el perfil del votante consistente: participa sin importar el tipo de elección y su participación no cambia con el tiempo.
 
-**P4 - Voces que avanzan (8.4M, 11.8%).** Participación de 62.0% con la mayor brecha presidencial (+19.5) y la mayor tendencia ascendente (+4.5). Mayoría femenina (68%), adultas de 40-49, con la mayor escolaridad (10.1 grados, 50% posbásica) y mayor afiliación al ISSSTE (7.9%). Es el perfil de mayor dinamismo: mujeres educadas cuya participación crece con cada elección.
+**P4 - Voces que avanzan (8.4M, 11.8%).** Participación de 62.0%, con la mayor brecha presidencial (+19.5) y la mayor tendencia ascendente (+4.5, unos 22 puntos entre 2009 y 2024). Mayoría femenina (68%), adultas de 40-49 años. Vive en las secciones de mayor escolaridad (10.1 grados, 50% con educación posbásica) y con mayor afiliación al ISSSTE (7.9%). Es el perfil de mayor dinamismo: su participación crece en cada elección.
 
-**P5 - Pilar democrático (16.7M, 23.5%).** La participación más alta (72.8%), estable y con tendencia positiva (+1.8). Mayores de 50 (85% mayor de 40), mayoría femenina (69%), el perfil más rural (38% en secciones rurales o mixtas). Escolaridad polarizada: la más baja en zonas rurales pero la más alta en urbanas (11.0 grados). Las secciones con presencia indígena (40%+ en hogares indígenas) participan más que el promedio nacional (63.1 vs 55.1) y se concentran en este perfil (13.2% vs 7.1% nacional).
+**P5 - Pilar democrático (16.7M, 23.5%).** La participación más alta (72.8%), estable y con tendencia positiva (+1.8). Mayores de 50 años (85% mayor de 40), mayoría femenina (69%) y el perfil más rural (38% en secciones rurales o mixtas). Su escolaridad es polarizada: en zonas rurales vive en secciones de baja escolaridad y en zonas urbanas en las de mayor escolaridad (11.0 grados). Las secciones con 40% o más de hogares indígenas tienen mayor presencia en este perfil (13.2% de su población, contra 7.1% nacional).
 
-### 4.2 Estructura emergente
+### 4.2 Estructura de los perfiles
 
-Los seis perfiles revelan dos ejes ortogonales de variación en la participación ciudadana:
+Los seis perfiles se ordenan en dos ejes casi independientes:
 
-1. **Eje de nivel** (vertical): del 37% (P0) al 73% (P5), asociado a la edad y el sexo. Los jóvenes y los hombres participan menos.
-2. **Eje de forma** (horizontal): del patrón estable (P1, P3, P5: brecha < 11 puntos) al patrón reactivo-presidencial (P0, P2, P4: brecha > 14 puntos), asociado al territorio (brecha mayor en zonas urbanas del centro).
+1. **Cuánto vota (nivel):** del 37% de P0 al 73% de P5. Está asociado a la edad y el sexo: los jóvenes y los hombres participan menos.
+2. **Cómo vota (forma):** del patrón parejo (P1, P3, P5, con brecha menor a 11 puntos) al patrón que se activa en presidenciales (P0, P2, P4, con brecha mayor a 14 puntos). Está asociado al territorio, con brechas mayores en zonas urbanas del centro.
 
-Estos ejes son casi independientes: el ARI entre una segmentación por puro nivel y otra por pura forma es 0.03. La segmentación por clases latentes captura ambos simultáneamente.
+En los niveles medios de participación, el modelo separa a la población por forma: P1 y P2 votan en promedio casi lo mismo (48.5% y 50.5%), igual que P3 y P4 (60.3% y 62.0%), pero con trayectorias muy distintas. Esa distinción es la que permite diseñar estrategias diferenciadas.
 
 ## 5. Hallazgos transversales
 
 ### 5.1 La baja participación es urbana y joven, no rural ni marginada
 
-Contrario a la narrativa convencional, el perfil de menor participación (P0) tiene solo 4-5% de su población en municipios de alta marginación. Las secciones rurales e indígenas participan por encima del promedio nacional. El 71% de los votantes vive en municipios de marginación muy baja. La brecha de participación no es un problema de acceso o marginación, sino de motivación en contextos urbanos.
+Contrario a la narrativa convencional, el perfil de menor participación (P0) tiene solo 4-5% de su población en municipios de alta marginación. Las secciones rurales e indígenas participan por encima del promedio nacional, y el 71% de los votantes vive en municipios de marginación muy baja. Los datos sugieren que la barrera principal no es el acceso físico a la casilla, sino la relación de ciertos grupos urbanos y jóvenes con el proceso electoral.
 
 ### 5.2 Las secciones indígenas participan más
 
-Las secciones con 40% o más de hogares indígenas (7% de los votantes) tienen una participación promedio de 63.1% contra 55.1% del resto. La diferencia es mayor en intermedias (2015: 58.4 vs 47.6; 2021: 64.9 vs 51.7) y la brecha presidencial es menor (10.7 vs 13.6 puntos). Se concentran en P5 y P4.
+Las secciones con 40% o más de hogares indígenas (7% de los votantes) tienen una participación promedio de 63.1%, contra 55.1% del resto. La diferencia es mayor en intermedias (2015: 58.4 contra 47.6; 2021: 64.9 contra 51.7) y su brecha presidencial es menor (10.7 contra 13.6 puntos). Se concentran en P5 y P4.
 
 ### 5.3 La brecha presidencial-intermedia es el problema central
 
-P0, P2 y P4 suman 52% de la población analizada y su participación en intermedias está 14-20 puntos por debajo de su nivel en presidenciales. El principal desafío del INE no es incorporar ciudadanos que nunca votan, sino sostener la participación de quienes ya votan en presidenciales durante las elecciones intermedias.
+P0, P2 y P4 suman 52% de la población analizada y su participación en intermedias está entre 14 y 20 puntos por debajo de la de presidenciales. El principal desafío no es incorporar a quienes nunca votan, sino sostener en las intermedias la participación de quienes sí votan en presidenciales.
 
-### 5.4 P1 es la alerta roja del sistema
+### 5.4 P1 es la señal de alerta
 
-Es el único perfil en descenso sostenido, el de menor claridad de asignación y el de menor escolaridad y acceso a internet. Si no se interviene, estos 5.9 millones de ciudadanos podrían migrar conductualmente hacia P0.
+Es el único perfil en descenso sostenido, el de asignación menos clara y el que vive en secciones con menor escolaridad y acceso a internet. Si la tendencia continúa, estos 5.9 millones de ciudadanos podrían acercarse al comportamiento de P0.
 
 ## 6. Estrategias diferenciadas
 
-Cada estrategia se fundamenta en el diagnóstico del perfil (barrera, canal viable, momento crítico y territorio prioritario).
+Cada estrategia parte del diagnóstico del perfil: barrera, mensaje, canal, momento y territorio. El CCPC registra si una persona votó, no por qué; por eso las barreras son hipótesis derivadas del patrón observado y se proponen para validarse mediante pilotos en los territorios prioritarios. Todos los mensajes son institucionales y no partidistas.
 
 ### P0 - Por convencer: acercamiento por relevancia
 
-- **Barrera:** desvinculación; la participación electoral no forma parte de su identidad.
-- **Mensaje:** centrar la comunicación en cómo las decisiones electorales afectan su cotidianidad (empleo, seguridad, servicios urbanos). Evitar mensajes moralizantes; privilegiar el impacto personal.
-- **Canal:** digital (redes sociales, video corto) complementado con presencia en espacios urbanos (universidades, centros deportivos). El 51% con internet permite estrategia mixta.
-- **Momento:** elecciones intermedias, donde la caída es más pronunciada. Activación 3-4 meses antes.
-- **Territorio:** Noroeste (Baja California, Sonora, Chihuahua, Sinaloa).
+- **Barrera probable:** la participación electoral no forma parte de su rutina ni de su identidad.
+- **Mensaje:** cómo las decisiones electorales afectan su vida cotidiana (empleo, seguridad, servicios urbanos), sin mensajes moralizantes.
+- **Canal:** digital (redes sociales, video corto) y presencia en espacios urbanos (universidades, centros deportivos).
+- **Momento y territorio:** activación 3-4 meses antes de las intermedias, donde más cae. Noroeste (Baja California, Sonora, Chihuahua, Sinaloa).
 
-### P1 - Constancia que se apaga: reactivación urgente
+### P1 - Constancia que se apaga: reactivación temprana
 
-- **Barrera:** desencanto progresivo; participaban pero están dejando de hacerlo.
-- **Mensaje:** reconocer su participación pasada y mostrar resultados tangibles de elecciones recientes en su región. Evidencia local de márgenes estrechos.
-- **Canal:** medios tradicionales (radio local, perifoneo) y organizaciones comunitarias. Internet es el más bajo (49%); lo digital es complementario.
-- **Momento:** intervención continua, no solo en periodo electoral. Programas de vinculación cívica permanente.
-- **Territorio:** Occidente (Jalisco, Guanajuato, Colima). Subperfil 1.1 (caída de -3.8 por elección) como caso crítico.
+- **Barrera probable:** desencanto progresivo; participaban y están dejando de hacerlo.
+- **Mensaje:** reconocer su participación pasada y mostrar con datos locales que cada voto cuenta.
+- **Canal:** radio local, perifoneo y organizaciones comunitarias. Su acceso a internet es el más bajo (49%); lo digital es complementario.
+- **Momento y territorio:** vinculación cívica permanente, no solo en periodo electoral. Occidente (Jalisco, Guanajuato, Colima); el subperfil 1.1, que pierde 3.8 puntos por elección, es el caso más urgente.
 
 ### P2 - Generación en ascenso: sostener el impulso
 
-- **Barrera:** participación selectiva; responde a la "emoción" presidencial pero no percibe las intermedias como relevantes.
-- **Mensaje:** comunicar que las elecciones intermedias definen servicios locales. Datos locales de márgenes estrechos. Identidad generacional ascendente.
-- **Canal:** digital (55% internet, el más alto). Redes sociales, plataformas de video, contenido interactivo y compartible.
-- **Momento:** esfuerzo concentrado 6 meses antes de intermedias. En presidenciales ya se movilizan solos.
-- **Territorio:** distribución amplia urbana. Subperfil 2.1 (tendencia +6.4) fuerte en Tlaxcala y centro.
+- **Barrera probable:** participación selectiva; responde a la elección presidencial pero no percibe las intermedias como relevantes.
+- **Mensaje:** las intermedias definen servicios locales (transporte, educación, salud); apelación a su identidad generacional.
+- **Canal:** digital (55% con internet, el más alto): redes sociales, video, contenido interactivo y compartible.
+- **Momento y territorio:** esfuerzo concentrado 6 meses antes de las intermedias. Urbano nacional; el subperfil 2.1 (+6.4 puntos por elección) destaca en Tlaxcala y el centro.
 
 ### P3 - Paso firme: reconocer, mantener y multiplicar
 
-- **Barrera:** ninguna crítica. El riesgo es la complacencia institucional.
-- **Mensaje:** reconocimiento por su constancia. Invitarlos como multiplicadores en su entorno.
-- **Canal:** mixto (52% internet). Programas de promotores cívicos voluntarios reclutados de este perfil.
-- **Momento:** mantenimiento continuo con refuerzo electoral. Atención al subperfil 3.5 en declive.
-- **Territorio:** Occidente (Jalisco, Guanajuato, Michoacán).
+- **Barrera probable:** ninguna crítica. El riesgo es darlo por sentado.
+- **Mensaje:** reconocimiento por su constancia e invitación a ser multiplicadores en su entorno.
+- **Canal:** mixto (52% con internet) y programas de promotores cívicos voluntarios reclutados de este perfil.
+- **Momento y territorio:** mantenimiento continuo con refuerzo electoral. Occidente (Jalisco, Guanajuato, Michoacán); atención al subperfil 3.5, que va a la baja.
 
 ### P4 - Voces que avanzan: canalizar el liderazgo cívico femenino
 
-- **Barrera:** brecha presidencial-intermedia, pero con base alta. La oportunidad es el liderazgo cívico.
-- **Mensaje:** empoderar: invitar a roles de observadoras electorales, capacitadoras, promotoras del voto. Visibilizar el impacto de la participación femenina con datos.
-- **Canal:** digital (53% internet) y redes de mujeres organizadas (asociaciones, sindicatos). Contenido con perspectiva de género.
-- **Momento:** aprovechar el impulso post-presidencial para institucionalizar participación en intermedias.
-- **Territorio:** amplia presencia. Subperfil 4.3 (tendencia +7.3) fuerte en Tlaxcala, dominante en 201 municipios.
+- **Barrera probable:** la misma brecha presidencial-intermedia que P2, pero sobre una participación base alta. La oportunidad es el liderazgo cívico.
+- **Mensaje:** invitación a roles de observadoras electorales, capacitadoras y promotoras del voto; visibilizar con datos el crecimiento de la participación femenina.
+- **Canal:** digital (53% con internet) y redes de mujeres organizadas (asociaciones, sindicatos, comités vecinales).
+- **Momento y territorio:** aprovechar el impulso posterior a cada presidencial para sostener las intermedias. Presencia nacional; el subperfil 4.3 (+7.3 puntos por elección, dominante en 201 municipios, fuerte en Tlaxcala) es buen candidato para un piloto.
 
 ### P5 - Pilar democrático: preservar, facilitar y transmitir
 
-- **Barrera:** envejecimiento y accesibilidad. Edad avanzada plantea retos de movilidad.
-- **Mensaje:** gratitud institucional. Invitarlos a transmitir el hábito del voto a generaciones jóvenes.
-- **Canal:** presencial y medios tradicionales (radio comunitaria, televisión, materiales impresos). Internet es secundario (49% y edad avanzada).
-- **Momento:** permanente. Asegurar condiciones logísticas: casillas accesibles, asistencia para mayores.
-- **Territorio:** distribución rural amplia. Subperfil 5.5 (76.5%, 62% rural) en Campeche y Sur-Sureste. Secciones indígenas como activo a preservar.
+- **Barrera probable:** envejecimiento y movilidad; en zonas rurales, la distancia a la casilla.
+- **Mensaje:** reconocimiento institucional e invitación a transmitir el hábito del voto a las generaciones jóvenes.
+- **Canal:** presencial y medios tradicionales (radio comunitaria, televisión, impresos).
+- **Momento y territorio:** permanente, con casillas accesibles y asistencia a personas mayores en cada jornada. Rural y Sur-Sureste; el subperfil 5.5 (76.5% de participación, 62% rural) destaca en Campeche.
 
 ### Matriz de intervención
 
-| Perfil | Prioridad | Objetivo | Canal | Territorio |
-|---|---|---|---|---|
-| P0 Por convencer | Muy alta | Incorporar | Digital + presencial urbano | Noroeste |
-| P1 Constancia que se apaga | Alta (urgente) | Reactivar | Tradicional, comunidad | Occidente |
-| P2 Generación en ascenso | Alta | Sostener en intermedias | Digital | Nacional urbano |
-| P3 Paso firme | Media | Mantener, multiplicar | Mixto | Occidente |
-| P4 Voces que avanzan | Media-alta | Liderazgo cívico | Digital + redes mujeres | Nacional |
-| P5 Pilar democrático | Alta (preservar) | Facilitar, transmitir | Presencial, radio | Rural, Sur-Sureste |
+| Perfil | Prioridad | Objetivo | Canal | Territorio | Cómo medir el avance |
+|---|---|---|---|---|---|
+| P0 Por convencer | Muy alta | Incorporar | Digital + presencial urbano | Noroeste | Participación en intermedias |
+| P1 Constancia que se apaga | Alta (temprana) | Reactivar | Tradicional, comunidad | Occidente | Que la tendencia deje de caer |
+| P2 Generación en ascenso | Alta | Sostener en intermedias | Digital | Nacional urbano | Brecha presidencial-intermedia menor |
+| P3 Paso firme | Media | Mantener, multiplicar | Mixto | Occidente | Participación arriba de 60% |
+| P4 Voces que avanzan | Media-alta | Liderazgo cívico | Digital + redes de mujeres | Nacional | Observadoras y capacitadoras del perfil |
+| P5 Pilar democrático | Alta (preservar) | Facilitar, transmitir | Presencial, radio | Rural, Sur-Sureste | Participación joven en sus secciones |
+
+Cada indicador se mide en las secciones donde el perfil tiene mayor concentración, comparando antes y después de la intervención.
 
 ## 7. Limitaciones
 
-1. **Dato ecológico.** La escolaridad e internet provienen del promedio de la sección (ECEG 2020), no de los individuos de la celda. La celda sociodemográfica del CCPC tampoco sigue a las mismas personas entre elecciones.
+1. **Dato agregado, no individual.** La escolaridad y el internet son promedios de la sección (ECEG 2020), no características de las personas de la celda. Afirmaciones como "P4 vive en secciones de mayor escolaridad" no implican que sus integrantes tengan, individualmente, mayor escolaridad. Además, la celda no sigue a las mismas personas entre elecciones: describe a quienes tienen ese sexo y edad en esa sección en cada momento.
 2. **Desfase temporal.** Los indicadores censales son de 2020; la lista nominal de 2024 refleja cambios demográficos y migratorios no capturados.
-3. **Continuo subyacente.** La participación electoral es un continuo, no clusters discretos (silhouette máximo 0.31 en clustering convencional). Los perfiles son zonas de densidad en ese continuo, no fronteras netas. La entropía relativa de 0.78 y el 69% de asignaciones claras reflejan esta realidad.
-4. **Ausencia de Campeche en PJ 2025.** Los datos del Poder Judicial no incluyen a Campeche, por lo que sus celdas carecen de ese descriptor.
-5. **Voto anticipado y prisión preventiva.** Estos registros (30,012 votos en total) carecen de sección y edad, por lo que no se integran a la segmentación. Su volumen es marginal frente a los 71.2 millones del universo analizado.
+3. **La participación es un continuo.** No hay fronteras naturales entre grupos (separación máxima de 0.31). Los perfiles son zonas donde se concentran comportamientos parecidos, no categorías cerradas; por eso 31% de las personas tiene una asignación menos clara.
+4. **Las barreras son hipótesis.** El CCPC muestra si se votó, no por qué. Las barreras y mensajes propuestos deben validarse con pilotos o encuestas antes de escalarse.
+5. **Ausencia de Campeche en PJ 2025.** Los datos del Poder Judicial no incluyen a Campeche, por lo que sus celdas carecen de ese descriptor.
+6. **Voto anticipado y prisión preventiva.** Estos registros (30,012 votos en total) no tienen sección ni edad, por lo que no se integran a la segmentación. Su volumen es marginal frente a los 71.2 millones del universo analizado.
 
 ## 8. Conclusiones
 
-La segmentación por clases latentes sobre el comportamiento electoral de 2009 a 2024 revela seis perfiles ciudadanos estables (ARI 0.98), diferenciados no solo por su nivel de participación sino por su patrón temporal: la brecha presidencial-intermedia y la tendencia son ejes de variación independientes del nivel.
+El análisis de clases latentes sobre la conducta electoral de 2009 a 2024 identifica seis perfiles ciudadanos que se reproducen casi idénticos al repetir el análisis (estabilidad de 0.98 sobre 1). Los perfiles se distinguen no solo por cuánto vota la gente, sino por cómo vota: la diferencia entre presidenciales e intermedias y la tendencia en el tiempo son dimensiones independientes del nivel, y son las que hacen falta para diseñar estrategias distintas.
 
-Tres hallazgos desafían supuestos convencionales: la baja participación se concentra en zonas urbanas y jóvenes (no en las marginadas), las secciones indígenas participan por encima del promedio, y el principal reto no es incorporar a quienes nunca votan sino sostener a quienes solo votan en presidenciales. Los perfiles P0, P2 y P4, que suman 52% de la población, pierden entre 14 y 20 puntos porcentuales en elecciones intermedias.
+Tres hallazgos desafían supuestos convencionales: la baja participación se concentra en zonas urbanas y entre jóvenes, no en zonas marginadas; las secciones indígenas participan por encima del promedio; y el principal reto no es incorporar a quienes nunca votan, sino sostener a quienes solo votan en presidenciales. P0, P2 y P4, que suman 52% de la población, votan entre 14 y 20 puntos menos en las intermedias.
 
-Las estrategias propuestas responden a esta evidencia: canales digitales para los perfiles jóvenes y urbanos con internet (P0, P2, P4), medios tradicionales y comunitarios para los de menor acceso (P1, P5), y mensajes diferenciados que van desde la relevancia personal (P0) hasta el reconocimiento del liderazgo cívico femenino (P4) y la transmisión intergeneracional del hábito democrático (P5).
+Las estrategias propuestas responden a esta evidencia: canales digitales para los perfiles jóvenes y urbanos con mayor acceso a internet (P0, P2, P4), medios tradicionales y comunitarios para los de menor acceso (P1, P5), y mensajes diferenciados que van desde la relevancia personal (P0) hasta el liderazgo cívico femenino (P4) y la transmisión del hábito democrático entre generaciones (P5). La metodología es reproducible y puede reaplicarse con los datos de cada nueva elección para seguir la evolución de los perfiles.
 
 ## Referencias
 

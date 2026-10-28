@@ -1,5 +1,12 @@
 # Bitacora de Cambios
 
+## 2026-10-27
+
+### Entregables en lenguaje más accesible
+- `documento_tecnico.md`: sección 3 reescrita con tabla "Cómo leer las cifras", tabla de decisiones de partida, tabla de métodos probados y por qué se descartaron, explicación paso a paso de las clases latentes y justificación de k = 6 con la mejora del BIC (0.78% de 5 a 6 contra 0.28% de 6 a 7). Tabla de perfiles con encabezados completos y columna de asignación clara. Escolaridad redactada como dato de la sección, barreras como hipótesis, hallazgos sin afirmaciones causales, indicadores de avance en la matriz de intervención. Corregido: P2 no tiene la mayor escolaridad urbana (la tienen P5 y P4). Pasa de ~8 a ~10 cuartillas estimadas
+- `estrategias_por_perfil.md`: nota sobre barreras como hipótesis y dato por sección; "barrera probable"; escolaridad de P1, P2 y P4 como dato de la sección; "señal de alerta" y prioridad "temprana" para P1
+- `presentacion_ejecutiva.pptx`: diapositiva 4 en lenguaje llano con gráfica de P1 contra P2; etiquetas de la diapositiva 5 legibles ("Participación media", "Extra en presidenciales", "Cambio por elección"); quitada la afirmación "Las estrategias genéricas no funcionan"; "migrarán" pasa a "podría derivar"; "Microtargeting" pasa a "Focalización territorial"; sin menciones de ARI ni folium
+
 ## 2026-10-26
 
 ### Presentación ejecutiva (PPTX)
