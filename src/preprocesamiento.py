@@ -159,7 +159,6 @@ def consolidar_extras():
     for nombre in extras:
         salida = DIR_PREPROCESSED / f"{nombre}.parquet"
         if salida.exists():
-            n = pd.read_parquet(salida, columns=[salida.stem.split("_")[0][:3]]).shape[0] if salida.stat().st_size > 0 else 0
             print(f"  Ya existe: {salida.name}")
             continue
         carpeta = DIR_RAW / nombre

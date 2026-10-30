@@ -742,9 +742,9 @@ def panel_html(res_perfil, tray_perfil, nac_tray, descriptores,
         'border-radius:10px 10px 0 0;z-index:1;">Perfiles de participacion</div>'
         '<div style="padding:6px 10px 10px;">'
     )
-    nac_e = nac_edad.tolist()
-    nac_r = nac_reg.tolist()
-    nac_es = nac_esc_tramo.tolist()
+    nac_e = nac_edad
+    nac_r = nac_reg
+    nac_es = nac_esc_tramo
 
     for p, r in res_perfil.iterrows():
         c = COLORES_PERFIL[p]
