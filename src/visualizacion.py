@@ -175,7 +175,7 @@ def cargar_datos():
 
     fed24 = pd.read_parquet(
         DIR_PREPROCESSED / "conteos_federal_2009_2024.parquet",
-        columns=["EDOCVE", "SECCIÓN", "SEXO", "EDAD", "AELEC", "SV", "NV", "MPIOCVE", "MPIONOM"],
+        columns=["EDOCVE", "SECCION", "SEXO", "EDAD", "AELEC", "SV", "NV", "MPIOCVE", "MPIONOM"],
         filters=[("AELEC", "==", 2024)],
     )
     fed24["GRUPO_EDAD"] = pd.cut(fed24["EDAD"], bins=CORTES_EDAD, labels=ETIQUETAS_EDAD)
@@ -186,7 +186,7 @@ def cargar_datos():
     )
     pesos["GRUPO_EDAD"] = pesos["GRUPO_EDAD"].astype(str)
     sec_mpio = (
-        fed24.groupby(["EDOCVE", "SECCIÓN"])
+        fed24.groupby(["EDOCVE", "SECCION"])
         .agg(MPIOCVE=("MPIOCVE", "first"), MPIONOM=("MPIONOM", "first"))
         .reset_index()
     )
@@ -194,12 +194,12 @@ def cargar_datos():
 
     secciones = pd.read_parquet(
         DIR_PREPROCESSED / "secciones_historial.parquet",
-        columns=["EDOCVE", "SECCIÓN", "P_PJ2025"],
+        columns=["EDOCVE", "SECCION", "P_PJ2025"],
     )
     celdas = (
         celdas.merge(pesos, on=LLAVES, how="left")
-        .merge(secciones, on=["EDOCVE", "SECCIÓN"], how="left")
-        .merge(sec_mpio, on=["EDOCVE", "SECCIÓN"], how="left")
+        .merge(secciones, on=["EDOCVE", "SECCION"], how="left")
+        .merge(sec_mpio, on=["EDOCVE", "SECCION"], how="left")
         .dropna(subset=["peso"])
         .reset_index(drop=True)
     )
@@ -207,7 +207,7 @@ def cargar_datos():
 
     # Escolaridad ECEG 2020
     eceg = pd.read_parquet(DIR_PREPROCESSED / "secciones_eceg_2020.parquet")
-    celdas = celdas.merge(eceg, on=["EDOCVE", "SECCIÓN"], how="left")
+    celdas = celdas.merge(eceg, on=["EDOCVE", "SECCION"], how="left")
     mujer, hombre = celdas["SEXO"] == 1, celdas["SEXO"] == 0
     celdas["escolaridad"] = np.select(
         [mujer, hombre], [celdas["GRAPROES_F"], celdas["GRAPROES_M"]], celdas["GRAPROES"]
@@ -219,7 +219,7 @@ def cargar_datos():
     celdas["tramo_esc"] = pd.cut(
         celdas["escolaridad"], CORTES_ESC, labels=TRAMOS_ESC, right=False
     ).astype(str)
-    celdas = celdas.drop(columns=eceg.columns.drop(["EDOCVE", "SECCIÓN"]))
+    celdas = celdas.drop(columns=eceg.columns.drop(["EDOCVE", "SECCION"]))
     del eceg
 
     # Variables derivadas
@@ -291,7 +291,7 @@ def generar_descriptores(celdas, res_perfil, K):
     idx_edad, _ = indices("banda_edad")
     _, pct_sexo = indices("sexo_txt")
     idx_tipo, _ = indices(celdas["TIPOSEC"].astype(str).rename("tipo_txt"))
-    idx_region, _ = indices("REGIÓN")
+    idx_region, _ = indices("REGION")
 
     def rasgos_demograficos(p):
         rasgos = []
@@ -550,7 +550,7 @@ def generar_fichas(celdas, res_perfil, res_sub, tray_perfil, nac_tray,
                                edad.to_numpy(), nac_edad.to_numpy(), color, "Edad (gris = nacional)")
 
             # Region
-            reg = dp.groupby("REGIÓN")["peso"].sum().reindex(REGIONES_ORDEN, fill_value=0)
+            reg = dp.groupby("REGION")["peso"].sum().reindex(REGIONES_ORDEN, fill_value=0)
             reg = reg / dp["peso"].sum() * 100
             barras_vs_nacional(fig.add_subplot(gs[1, 1]), REGIONES_ORDEN,
                                reg.to_numpy(), nac_reg.to_numpy(), color, "Region (gris = nacional)")
@@ -834,7 +834,7 @@ def generar_mapa_interactivo(gmun, gedo, celdas, res_perfil, tray_perfil, nac_tr
         wp = dp["peso"].sum()
         dist_edad[p] = (dp.groupby("GRUPO_EDAD")["peso"].sum()
                         .reindex(ETIQUETAS_EDAD, fill_value=0) / wp * 100).tolist()
-        dist_region[p] = (dp.groupby("REGIÓN")["peso"].sum()
+        dist_region[p] = (dp.groupby("REGION")["peso"].sum()
                           .reindex(REGIONES_ORDEN, fill_value=0) / wp * 100).tolist()
         con = dp[dp["escolaridad"].notna()]
         wc = con["peso"].sum() or 1
@@ -921,7 +921,7 @@ def main():
     # Referencias nacionales
     nac_tray = [np.average(celdas[e], weights=celdas["peso"]) for e in ELECCIONES]
     nac_edad = celdas.groupby("GRUPO_EDAD")["peso"].sum()[ETIQUETAS_EDAD] / w_total * 100
-    nac_reg = celdas.groupby("REGIÓN")["peso"].sum()[REGIONES_ORDEN] / w_total * 100
+    nac_reg = celdas.groupby("REGION")["peso"].sum()[REGIONES_ORDEN] / w_total * 100
     con_esc = celdas[celdas["escolaridad"].notna()]
     nac_esc_tramo = con_esc.groupby("tramo_esc")["peso"].sum()[TRAMOS_ESC] / con_esc["peso"].sum() * 100
     nac_esc = np.average(con_esc["escolaridad"], weights=con_esc["peso"])

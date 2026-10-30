@@ -73,7 +73,7 @@ SCHEMA_FEDERAL = pa.schema([
     ("AELEC", pa.int64()), ("FELECCION", pa.string()),
     ("EDOCVE", pa.int64()), ("EDONOM", pa.string()),
     ("MPIOCVE", pa.int64()), ("MPIONOM", pa.string()),
-    ("SECCIÓN", pa.int64()), ("TIPOSEC", pa.string()),
+    ("SECCION", pa.int64()), ("TIPOSEC", pa.string()),
     ("DEF", pa.string()), ("DEL", pa.string()),
     ("SEXO", pa.int64()), ("EDAD", pa.int64()),
     ("LN", pa.int64()), ("SV", pa.int64()),
@@ -82,7 +82,7 @@ SCHEMA_FEDERAL = pa.schema([
 
 # Columnas de la ECEG que se necesitan
 COLUMNAS_ECEG = [
-    "ENTIDAD", "SECCIÓN", "POBTOT", "P_15YMAS",
+    "ENTIDAD", "SECCION", "POBTOT", "P_15YMAS",
     "P_18YMAS", "P_18YMAS_F", "P_18YMAS_M",
     "GRAPROES", "GRAPROES_F", "GRAPROES_M",
     "P18YM_PB", "P18YM_PB_F", "P18YM_PB_M",
@@ -221,16 +221,16 @@ def construir_historial_secciones(df):
     no disponibles) y se descarta.
     """
     # Agregar a seccion x ano
-    sec_ano = df.groupby(["EDOCVE", "SECCIÓN", "AELEC"])[["LN", "SV", "NV"]].sum().reset_index()
+    sec_ano = df.groupby(["EDOCVE", "SECCION", "AELEC"])[["LN", "SV", "NV"]].sum().reset_index()
     sec_ano["PART"] = sec_ano["SV"] / (sec_ano["SV"] + sec_ano["NV"]) * 100
 
     # Filtrar secciones con las 6 elecciones
     sec_ano = sec_ano.dropna(subset=["PART"])
-    n_anos = sec_ano.groupby(["EDOCVE", "SECCIÓN"])["AELEC"].transform("size")
+    n_anos = sec_ano.groupby(["EDOCVE", "SECCION"])["AELEC"].transform("size")
     sec_ano = sec_ano[n_anos == len(ANOS)]
 
     # Pivotar a formato ancho
-    secciones = sec_ano.pivot(index=["EDOCVE", "SECCIÓN"], columns="AELEC", values="PART")
+    secciones = sec_ano.pivot(index=["EDOCVE", "SECCION"], columns="AELEC", values="PART")
     secciones.columns = COLS_ANOS
     del sec_ano
 
@@ -240,17 +240,17 @@ def construir_historial_secciones(df):
     # Atributos de la seccion (tipo y lista nominal 2024)
     attr_2024 = (
         df[df["AELEC"] == 2024]
-        .groupby(["EDOCVE", "SECCIÓN"], observed=True)
+        .groupby(["EDOCVE", "SECCION"], observed=True)
         .agg(TIPOSEC=("TIPOSEC", "first"), LN2024=("LN", "sum"))
     )
     secciones = secciones.join(attr_2024)
-    secciones["REGIÓN"] = secciones.index.get_level_values("EDOCVE").map(REGION_POR_EDO)
+    secciones["REGION"] = secciones.index.get_level_values("EDOCVE").map(REGION_POR_EDO)
 
     # Participacion PJ 2025 por seccion
     pj = pd.read_parquet(
-        DIR_PREPROCESSED / "conteos_pj2025.parquet", columns=["EDOCVE", "SECCIÓN", "SV", "NV"]
+        DIR_PREPROCESSED / "conteos_pj2025.parquet", columns=["EDOCVE", "SECCION", "SV", "NV"]
     )
-    pj = pj.groupby(["EDOCVE", "SECCIÓN"])[["SV", "NV"]].sum()
+    pj = pj.groupby(["EDOCVE", "SECCION"])[["SV", "NV"]].sum()
     pj_part = (pj["SV"] / (pj["SV"] + pj["NV"]) * 100).rename("P_PJ2025")
     pj_part.index = pj_part.index.set_levels([
         pj_part.index.levels[0].astype("int8"),
@@ -275,7 +275,7 @@ def construir_historial_celdas(df, attr_2024):
     una para que la tasa sea estable. La celda no sigue a las mismas personas:
     cada ano el grupo de edad se renueva.
     """
-    claves = ["EDOCVE", "SECCIÓN", "SEXO", "GRUPO_EDAD"]
+    claves = ["EDOCVE", "SECCION", "SEXO", "GRUPO_EDAD"]
 
     # Agregar a celda x ano
     cel_ano = df.groupby(claves + ["AELEC"], observed=True)[["SV", "NV"]].sum()
@@ -296,9 +296,9 @@ def construir_historial_celdas(df, attr_2024):
 
     # Tipo de seccion y region
     celdas = celdas.merge(
-        attr_2024[["TIPOSEC"]], left_on=["EDOCVE", "SECCIÓN"], right_index=True, how="left"
+        attr_2024[["TIPOSEC"]], left_on=["EDOCVE", "SECCION"], right_index=True, how="left"
     )
-    celdas["REGIÓN"] = celdas["EDOCVE"].map(REGION_POR_EDO)
+    celdas["REGION"] = celdas["EDOCVE"].map(REGION_POR_EDO)
 
     n = len(celdas)
     print(f"  Celdas con historial completo: {n:,}")
@@ -319,9 +319,9 @@ def etapa_historial():
         return
 
     # Cargar dataset federal completo
-    columnas = ["AELEC", "EDOCVE", "SECCIÓN", "TIPOSEC", "SEXO", "EDAD", "LN", "SV", "NV"]
+    columnas = ["AELEC", "EDOCVE", "SECCION", "TIPOSEC", "SEXO", "EDAD", "LN", "SV", "NV"]
     tipos = {
-        "AELEC": "int16", "EDOCVE": "int8", "SECCIÓN": "int32", "TIPOSEC": "category",
+        "AELEC": "int16", "EDOCVE": "int8", "SECCION": "int32", "TIPOSEC": "category",
         "SEXO": "int8", "EDAD": "int16", "LN": "int16", "SV": "int16", "NV": "int16",
     }
     print("  Cargando dataset federal...")
@@ -334,7 +334,7 @@ def etapa_historial():
 
     # Variables derivadas
     df["GRUPO_EDAD"] = pd.cut(df["EDAD"], bins=CORTES_EDAD, labels=ETIQUETAS_EDAD)
-    df["REGIÓN"] = df["EDOCVE"].map(REGION_POR_EDO).astype("category")
+    df["REGION"] = df["EDOCVE"].map(REGION_POR_EDO).astype("category")
 
     print("\n  Historial por seccion:")
     secciones = construir_historial_secciones(df)
@@ -342,7 +342,7 @@ def etapa_historial():
     # Atributos de 2024 para las celdas
     attr_2024 = (
         df[df["AELEC"] == 2024]
-        .groupby(["EDOCVE", "SECCIÓN"], observed=True)
+        .groupby(["EDOCVE", "SECCION"], observed=True)
         .agg(TIPOSEC=("TIPOSEC", "first"), LN2024=("LN", "sum"))
     )
 
@@ -377,7 +377,7 @@ def etapa_eceg():
     eceg = eceg.rename(columns={"ENTIDAD": "EDOCVE"})
 
     # -6 es codigo de confidencialidad del INEGI; 0 en P_15YMAS indica sin poblacion
-    valores = eceg.columns.drop(["EDOCVE", "SECCIÓN"])
+    valores = eceg.columns.drop(["EDOCVE", "SECCION"])
     eceg[valores] = eceg[valores].mask(eceg[valores] < 0)
     sin_poblacion = eceg["P_15YMAS"].fillna(0) == 0
     eceg.loc[sin_poblacion, ["GRAPROES", "GRAPROES_F", "GRAPROES_M"]] = np.nan
@@ -393,7 +393,7 @@ def etapa_eceg():
     )
 
     columnas_salida = [
-        "EDOCVE", "SECCIÓN", "POBTOT", "P_15YMAS", "P_18YMAS",
+        "EDOCVE", "SECCION", "POBTOT", "P_15YMAS", "P_18YMAS",
         "GRAPROES", "GRAPROES_F", "GRAPROES_M",
         "PCT_POSBASICA", "PCT_POSBASICA_F", "PCT_POSBASICA_M", "PCT_INTERNET",
     ]

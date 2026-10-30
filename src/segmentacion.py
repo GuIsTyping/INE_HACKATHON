@@ -51,7 +51,7 @@ DIR_PREPROCESSED = ROOT / "DATA" / "PREPROCESSED"
 ELECCIONES = ["P2009", "P2012", "P2015", "P2018", "P2021", "P2024"]
 CORTES_EDAD = [17, 24, 29, 39, 49, 59, 69, 79, 200]
 ETIQUETAS_EDAD = ["18-24", "25-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80+"]
-LLAVES = ["EDOCVE", "SECCIÓN", "SEXO", "GRUPO_EDAD"]
+LLAVES = ["EDOCVE", "SECCION", "SEXO", "GRUPO_EDAD"]
 BASE = ["promedio", "brecha_pres", "tendencia"]
 
 RANDOM_STATE = 42
@@ -129,7 +129,7 @@ def cargar_celdas_con_peso():
 
     fed24 = pd.read_parquet(
         DIR_PREPROCESSED / "conteos_federal_2009_2024.parquet",
-        columns=["EDOCVE", "SECCIÓN", "SEXO", "EDAD", "AELEC", "SV", "NV", "MPIOCVE", "MPIONOM"],
+        columns=["EDOCVE", "SECCION", "SEXO", "EDAD", "AELEC", "SV", "NV", "MPIOCVE", "MPIONOM"],
         filters=[("AELEC", "==", 2024)],
     )
     fed24["GRUPO_EDAD"] = pd.cut(fed24["EDAD"], bins=CORTES_EDAD, labels=ETIQUETAS_EDAD)
@@ -140,7 +140,7 @@ def cargar_celdas_con_peso():
     )
     pesos["GRUPO_EDAD"] = pesos["GRUPO_EDAD"].astype(str)
     sec_mpio = (
-        fed24.groupby(["EDOCVE", "SECCIÓN"])
+        fed24.groupby(["EDOCVE", "SECCION"])
         .agg(MPIOCVE=("MPIOCVE", "first"), MPIONOM=("MPIONOM", "first"))
         .reset_index()
     )
@@ -148,12 +148,12 @@ def cargar_celdas_con_peso():
 
     secciones = pd.read_parquet(
         DIR_PREPROCESSED / "secciones_historial.parquet",
-        columns=["EDOCVE", "SECCIÓN", "P_PJ2025"],
+        columns=["EDOCVE", "SECCION", "P_PJ2025"],
     )
     celdas = (
         celdas.merge(pesos, on=LLAVES, how="left")
-        .merge(secciones, on=["EDOCVE", "SECCIÓN"], how="left")
-        .merge(sec_mpio, on=["EDOCVE", "SECCIÓN"], how="left")
+        .merge(secciones, on=["EDOCVE", "SECCION"], how="left")
+        .merge(sec_mpio, on=["EDOCVE", "SECCION"], how="left")
         .dropna(subset=["peso"])
         .reset_index(drop=True)
     )
@@ -235,7 +235,7 @@ def resumen_lca(celdas, por):
         if col in out.columns:
             out[col] *= 100
     out["edad_dominante"] = dominante(celdas, por, "GRUPO_EDAD")
-    out["region_dominante"] = dominante(celdas, por, "REGIÓN")
+    out["region_dominante"] = dominante(celdas, por, "REGION")
     return out.round(1)
 
 
@@ -365,7 +365,7 @@ def resumen_subperfiles(celdas, por):
             out[col] = media_ponderada(celdas, col, por)
     out[["MUJER", "RURAL_MIXTA"]] *= 100
     out["edad_dominante"] = dominante(celdas, por, "GRUPO_EDAD")
-    out["region_dominante"] = dominante(celdas, por, "REGIÓN")
+    out["region_dominante"] = dominante(celdas, por, "REGION")
     return out.round(1)
 
 
