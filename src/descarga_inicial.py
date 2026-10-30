@@ -2,16 +2,19 @@
 Descarga inicial de todos los recursos del proyecto.
 
 Datasets de la plataforma CCPC del INE (ZIPs con CSVs), Estadisticas Censales
-a Escalas Geoelectorales 2020 del INEGI (indicadores del censo por seccion)
-y documentos informativos del hackaton (PDFs).
+a Escalas Geoelectorales 2020 del INEGI (indicadores del censo por seccion),
+shapefile municipal de CONABIO/INEGI y documentos informativos del hackaton (PDFs).
 
 Estructura de salida:
-    DATA/RAW/ZIPS/          ZIPs descargados
-    DATA/RAW/<dataset>/     CSVs extraidos por dataset
-    DATA/DOCS/              PDFs y documentos de referencia
+    DATA/RAW/ZIPS/                  ZIPs descargados
+    DATA/RAW/<dataset>/             CSVs extraidos por dataset
+    DATA/RAW/marco_geoestadistico/  Shapefile municipal 2022
+    DATA/DOCS/                      PDFs y documentos de referencia
 
 Uso:
     uv run python src/descarga_inicial.py
+
+Autores: Angel David Durazo Bartolini y Jehu Jonathan Ramirez Ramirez
 """
 
 import zipfile

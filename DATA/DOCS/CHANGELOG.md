@@ -1,5 +1,15 @@
 # Bitacora de Cambios
 
+## 2026-10-30
+
+### Scripts de produccion
+- `src/descarga_inicial.py`: actualizado docstring con autoria y mencion de shapefiles/ECEG
+- `src/preprocesamiento.py` (nuevo, ~290 lineas): consolidacion federal con PyArrow, historial por seccion y celda, ECEG 2020. Codigo de produccion extraido de notebooks 01, 03 y 10
+- `src/segmentacion.py` (nuevo, ~380 lineas): clases latentes (EM propio sobre terciles ponderados, k=6) y subperfiles anidados (KMeans, 27 subperfiles). Codigo extraido de notebooks 08 y 09
+- `src/visualizacion.py` (nuevo, ~580 lineas): fichas PNG/PDF, mapa estatico, mapa interactivo folium, tablas CSV, cruce municipal por nombre. Codigo extraido de notebook 11
+- Todos con logica skip-if-exists, autoria de Angel David Durazo Bartolini y Jehu Jonathan Ramirez Ramirez
+- `ejecutar_pipeline.sh` (nuevo): script ejecutable que levanta el proyecto de cero (verifica UV, instala entorno, ejecuta los 4 scripts en orden) y al terminar inicia un servidor HTTP local en puerto 8765 para el mapa interactivo
+
 ## 2026-10-27
 
 ### Entregables en lenguaje más accesible

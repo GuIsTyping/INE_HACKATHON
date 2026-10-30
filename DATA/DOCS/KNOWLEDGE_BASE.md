@@ -59,8 +59,12 @@ Participar en el **Reto 1: Perfiles ciudadanos de participación** (Eje: Segment
 INE_HACKATHON/
   pyproject.toml              Entorno UV (dependencias reproducibles)
   .python-versión             Versión de Python fijada (3.12)
+  ejecutar_pipeline.sh          Ejecuta todo el pipeline de principio a fin
   src/
-    descarga_inicial.py       Script standalone de descarga y extracción
+    descarga_inicial.py       Descarga y extraccion de todos los recursos
+    preprocesamiento.py       Consolidacion a parquet, historial y ECEG
+    segmentacion.py           Clases latentes (LCA) y subperfiles anidados
+    visualizacion.py          Fichas PNG/PDF, mapas y tablas CSV
   notebooks/
     01_ingesta_datos.ipynb    Descarga, extracción y consolidación
     02_perfilado_datos.ipynb  Calidad, cobertura y participación por variable
@@ -269,7 +273,7 @@ Los datos del CCPC no incluyen escolaridad, ingreso ni autoadscripcion indígena
 
 ### Mapa nacional interactivo
 
-Tiles CARTO CDN (light_all). Dos capas con folium LayerControl (esquina superior derecha):
+Tiles CartoDB positron. Dos capas con folium LayerControl (esquina superior derecha):
 1. **Estatal:** 32 entidades, perfil dominante con popup de distribución (nombre + porcentaje).
 2. **Municipal:** 2,475 municipios (1,858 con clustering local, 518 bloqueados por muestra <30 celdas).
    Popup con distribución de perfiles + clustering local con detalle demográfico (sexo, edad).
@@ -501,6 +505,34 @@ Pregunta: cambia la segmentación si el modelo de clases latentes recibe, ademá
 
 **Nota:** Los datos de población indígena y afromexicana están disponibles como FILTRO en los tableros interactivos pero NO aparecen como columna en los CSVs descargados. Por sección se pueden tomar de la ECEG 2020 (`PHOG_IND`, `POB_AFRO`).
 
+## Scripts de Produccion (`src/`)
+
+Cuatro scripts standalone que reproducen el pipeline completo desde la descarga hasta las visualizaciones finales. Cada uno tiene logica skip-if-exists para ejecucion idempotente. Orden de ejecucion:
+
+1. `descarga_inicial.py` — Descarga 9 ZIPs (conteos federales 2009-2024, PJ 2025, voto anticipado, prision preventiva, ECEG 2020), 4 PDFs y el shapefile municipal CONABIO. Extrae todo a sus directorios correspondientes.
+
+2. `preprocesamiento.py` — Tres etapas:
+   - Consolidacion federal (PyArrow ParquetWriter, un row group por ano) + extras (PJ 2025, voto anticipado, prision preventiva)
+   - Historial: indicadores por seccion y por celda (seccion x sexo x grupo de edad): promedio, desviacion, brecha_pres, tendencia, P_PJ2025
+   - ECEG: escolaridad por sexo, % posbasica, % internet por seccion
+   
+3. `segmentacion.py` — Dos etapas:
+   - LCA: terciles ponderados por eleccion, EM propio (mezcla de categoricas), seleccion de k por BIC en 4-6, bootstrap de Poisson (ARI 0.98)
+   - Subperfiles: KMeans ponderado dentro de cada clase, seleccion de k por estabilidad (ARI >= 0.8), sobrerrepresentacion por entidad y persona-tipo, municipio dominante
+
+4. `visualizacion.py` — Carga y ensambla celdas con pesos, perfiles, subperfiles y ECEG. Genera:
+   - `vista_general.png`, `ficha_perfil_{0..5}.png`, `fichas_perfiles.pdf`
+   - `mapa_perfil_dominante.png` (estatico)
+   - `mapa_clases_latentes.html` (~12 MB, interactivo con folium y Stadia Maps)
+   - `fichas_resumen_perfiles.csv`, `fichas_municipios.csv`, `fichas_cruce_municipios.csv`
+   - Cruce municipal por nombre normalizado (3 pasos: exacto, contenido, aproximado)
+
+Autoria en todos los scripts: Angel David Durazo Bartolini y Jehu Jonathan Ramirez Ramirez.
+
+### Script de ejecucion completa
+
+`ejecutar_pipeline.sh` levanta el proyecto de cero: verifica/instala UV, instala Python 3.12 y dependencias con `uv sync`, ejecuta los 4 scripts en orden y al terminar inicia un servidor HTTP local en el puerto 8765 para servir el mapa interactivo. No requiere API key (Stadia Maps funciona desde localhost). Uso: `chmod +x ejecutar_pipeline.sh && ./ejecutar_pipeline.sh`.
+
 ## Estado del Proyecto
 
 - [x] Lectura de convocatoria y rubrica
@@ -524,7 +556,8 @@ Pregunta: cambia la segmentación si el modelo de clases latentes recibe, ademá
 - [x] Fichas y mapa de las clases latentes con escolaridad (notebook 11)
 - [x] Segmentación final: clases latentes (notebook 08, k=6) con subperfiles del 09
 - [x] Nombres definitivos de los perfiles (`NOMBRES` en el 11)
-- [ ] Propuesta de estrategias
-- [ ] Documento técnico
-- [ ] Fichas de perfil
-- [ ] Presentación ejecutiva
+- [x] Propuesta de estrategias (`DATA/DOCS/estrategias_por_perfil.md`)
+- [x] Documento técnico (`DATA/DOCS/documento_tecnico.pdf`, 10 páginas)
+- [x] Fichas de perfil (`DATA/PREPROCESSED/fichas/`)
+- [x] Presentación ejecutiva (`DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
+- [x] Scripts de produccion (`src/descarga_inicial.py`, `preprocesamiento.py`, `segmentacion.py`, `visualizacion.py`)
