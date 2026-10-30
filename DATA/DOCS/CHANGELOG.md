@@ -2,6 +2,10 @@
 
 ## 2026-10-30
 
+### Acentos en nombres de columna (notebooks y Knowledge Base)
+- Reemplazadas 102 ocurrencias de SECCION/REGION (antes con acento) en las 11 libretas para que coincidan con los parquets generados por los scripts
+- Actualizada la Knowledge Base con los mismos nombres sin acento
+
 ### Scripts de produccion
 - `src/descarga_inicial.py`: actualizado docstring con autoria y mencion de shapefiles/ECEG
 - `src/preprocesamiento.py` (nuevo, ~290 lineas): consolidacion federal con PyArrow, historial por seccion y celda, ECEG 2020. Codigo de produccion extraido de notebooks 01, 03 y 10

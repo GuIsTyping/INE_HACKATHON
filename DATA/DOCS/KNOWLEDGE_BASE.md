@@ -126,12 +126,12 @@ Cada ZIP contiene un solo año de elección. 32 CSVs por entidad federativa.
 | conteos2021 | ~9.4M | 16 (estándar) | DERFE 2021 |
 | conteos2024 | ~9.8M | 16 (SEXO incluye 2=NB) | DERFE 2023 |
 
-Columnas estándar: AELEC, FELECCION, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCIÓN, TIPOSEC, DEF, DEL, SEXO, EDAD, LN, SV, NV, NS
+Columnas estándar: AELEC, FELECCION, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCION, TIPOSEC, DEF, DEL, SEXO, EDAD, LN, SV, NV, NS
 
 ### Dataset PJ 2025 (conteosPJ2025)
 
 - 31 CSVs, ~9.8M filas. No incluye Campeche (EDOCVE 4): `P_PJ2025` es nulo en todas sus secciones
-- Columnas: AELEC, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCIÓN, TIPOSEC, DEF, CJ, DEJ, SEXO, EDAD, LN, SV, NV, NS
+- Columnas: AELEC, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCION, TIPOSEC, DEF, CJ, DEJ, SEXO, EDAD, LN, SV, NV, NS
 - Diferencias: sin FELECCION, sin DEL; usa CJ (Circuito Judicial) y DEJ (Distrito Judicial Electoral)
 - Marco cartográfico: DERFE 2025
 
@@ -143,7 +143,7 @@ Columnas estándar: AELEC, FELECCION, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCIÓN
 | FELECCION | Fecha de jornada electoral (no en PJ2025) |
 | EDOCVE/EDONOM | Clave y nombre de entidad federativa |
 | MPIOCVE/MPIONOM | Clave y nombre de municipio |
-| SECCIÓN | Sección electoral |
+| SECCION | Sección electoral |
 | TIPOSEC | Tipo de sección (U=Urbana, M=Mixta, R=Rural) |
 | DEF | Distrito Electoral Federal |
 | DEL | Distrito Electoral Local (no en PJ2025) |
@@ -190,7 +190,7 @@ El parquet federal se escribió con PyArrow ParquetWriter (un row group por año
 
 ### Cobertura
 - 32 entidades en todos los años federales (PJ 2025: 31, falta Campeche). Municipios 2,455-2,477; secciones 64,934 (2009) a 70,751 (2024).
-- 72,681 secciones distintas (EDOCVE + SECCIÓN); 62,048 (85%) presentes en las 6 elecciones federales.
+- 72,681 secciones distintas (EDOCVE + SECCION); 62,048 (85%) presentes en las 6 elecciones federales.
 
 ### Participación (SV / (SV + NV))
 | Año | 2009 | 2012 | 2015 | 2018 | 2021 | 2024 |
@@ -214,8 +214,8 @@ El parquet federal se escribió con PyArrow ParquetWriter (un row group por año
 ### Tablas para segmentación
 | Archivo | Unidad | Filas | Columnas clave |
 |---|---|---|---|
-| `secciones_historial.parquet` | EDOCVE + SECCIÓN | 54,892 | P2009..P2024, promedio, desviación, brecha_pres, tendencia, TIPOSEC, LN2024, REGIÓN, P_PJ2025 |
-| `celdas_historial.parquet` | EDOCVE + SECCIÓN + SEXO + GRUPO_EDAD | 657,497 | P2009..P2024, promedio, desviación, brecha_pres, tendencia, TIPOSEC, REGIÓN |
+| `secciones_historial.parquet` | EDOCVE + SECCION | 54,892 | P2009..P2024, promedio, desviación, brecha_pres, tendencia, TIPOSEC, LN2024, REGION, P_PJ2025 |
+| `celdas_historial.parquet` | EDOCVE + SECCION + SEXO + GRUPO_EDAD | 657,497 | P2009..P2024, promedio, desviación, brecha_pres, tendencia, TIPOSEC, REGION |
 
 - Indicadores: `promedio` (nivel), `desviacion` (estabilidad), `brecha_pres` (promedio 2012/2018/2024 - promedio 2009/2015/2021), `tendencia` (pendiente en puntos por elección).
 - Secciones: solo las que tienen tasa valida en las 6 elecciones (cubren 80M de 98M de LN 2024). 9,438 sección-año tienen todo el padrón en NS.
