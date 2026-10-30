@@ -3,10 +3,14 @@ DATA/RAW/ZIPS/
 DATA/RAW/conteos*/
 DATA/RAW/voto_anticipado_2024/
 DATA/RAW/prision_preventiva_2024/
+DATA/RAW/eceg_2020/
 DATA/PREPROCESSED/
 
 # PDFs descargados (se regeneran con el script)
 DATA/DOCS/*.pdf
+
+# Variables de entorno (API keys, secretos)
+.env
 
 # Entorno virtual
 .venv/
@@ -24,3 +28,10 @@ __pycache__/
 
 # UV lock (reproducible con uv sync)
 # uv.lock
+DATA/RAW/marco_geoestadistico/
+
+# Pruebas exploratorias locales (no se versionan)
+pruebas_locales/
+
+# DB_Store
+.DS_Store
