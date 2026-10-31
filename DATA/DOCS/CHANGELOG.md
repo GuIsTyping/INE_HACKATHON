@@ -2,6 +2,11 @@
 
 ## 2026-10-31
 
+### Detalles finales de formato
+- `documento_tecnico.pdf` regenerado: tablas en Arial 11 con interlineado 1.5 (antes 8-9 pt) y margenes de 2.2 cm (antes 2.5) para no pasar de 12 paginas
+- `documento_tecnico.md`: la tabla resumen de la seccion 4 se divide en dos (quienes son y como votan) porque 10 columnas no caben a 11 pt; mismas cifras
+- `presentacion_ejecutiva.pptx`: metadatos con titulo y autores del equipo, sin los valores heredados de la plantilla de python-pptx; diapositivas sin cambios
+
 ### Correcciones previas a la entrega
 - Fichas y mapa: restaurados acentos en nombres de perfil, descriptores, etiquetas y entidades (`src/visualizacion.py` y notebook 11), incluido "Menores de 40 años". Fichas regeneradas
 - Columnas de scripts sin acento (`desviacion`, `indice`, `metodo`, `entropia`) para que coincidan con los notebooks; el notebook 09 ya corre sobre los parquets del script
@@ -11,7 +16,7 @@
 - `documento_tecnico.md`: el indice de sobrerrepresentacion se expresa con 100 = nacional (decia 1,000); P1 pasa de tener "el" menor acceso a internet a "uno de los" menores (P5 49.12, P1 49.25). Mismo ajuste en `estrategias_por_perfil.md`
 - `documento_tecnico.pdf` generado desde el .md actual: 11 paginas, Arial 11, interlineado 1.5
 - README: ejecucion con `ejecutar_pipeline.sh`, 10 ZIPs, requisitos
-- `CLAUDE.md`: el estado actual ya no lista como pendientes pasos terminados
+
 
 ## 2026-10-30
 

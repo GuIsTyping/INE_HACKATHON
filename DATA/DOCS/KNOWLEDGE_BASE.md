@@ -32,7 +32,7 @@ Participar en el **Reto 1: Perfiles ciudadanos de participación** (Eje: Segment
 2. ~~Caracterizar cada grupo~~ (completado: edad, sexo, escolaridad, internet, región, historial)
 3. ~~Nombrar y describir cada perfil~~ (completado: fichas PNG/PDF, mapa interactivo)
 4. ~~Proponer estrategias diferenciadas~~ (completado: `DATA/DOCS/estrategias_por_perfil.md`)
-5. ~~Documento técnico~~ (fuente: `DATA/DOCS/documento_tecnico.md`; PDF: `DATA/DOCS/documento_tecnico.pdf`, 11 páginas, carta, Arial 11, interlineado 1.5 y tablas de 8-9 pt). El PDF se genera fuera del repositorio, no se versiona (`DATA/DOCS/*.pdf` está en `.gitignore`) y debe regenerarse si cambia el .md
+5. ~~Documento técnico~~ (fuente: `DATA/DOCS/documento_tecnico.md`; PDF: `DATA/DOCS/documento_tecnico.pdf`, 12 páginas, carta, márgenes de 2.2 cm, Arial 11 e interlineado 1.5 también en tablas). El PDF se genera fuera del repositorio, no se versiona (`DATA/DOCS/*.pdf` está en `.gitignore`) y debe regenerarse si cambia el .md
 6. ~~Presentación ejecutiva~~ (completado: `DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
 7. Cartas firmadas (cesión de derechos + declaratoria) — pendiente (requiere firma del equipo)
 
@@ -563,7 +563,7 @@ Verificado en clon limpio: `.sh` y notebooks 01-04 y 07-11 dan clases, subperfil
 - [x] Segmentación final: clases latentes (notebook 08, k=6) con subperfiles del 09
 - [x] Nombres definitivos de los perfiles (`NOMBRES` en el 11)
 - [x] Propuesta de estrategias (`DATA/DOCS/estrategias_por_perfil.md`)
-- [x] Documento técnico (`DATA/DOCS/documento_tecnico.pdf`, 11 páginas)
+- [x] Documento técnico (`DATA/DOCS/documento_tecnico.pdf`, 12 páginas)
 - [x] Fichas de perfil (`DATA/PREPROCESSED/fichas/`)
 - [x] Presentación ejecutiva (`DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
 - [x] Scripts de produccion (`src/descarga_inicial.py`, `preprocesamiento.py`, `segmentacion.py`, `visualizacion.py`)

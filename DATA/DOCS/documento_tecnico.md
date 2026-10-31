@@ -112,16 +112,25 @@ También probamos incluir 118 indicadores del censo como variables del modelo. N
 
 ## 4. Resultados: seis perfiles ciudadanos
 
-La siguiente tabla resume los seis perfiles. Las cifras de población corresponden a la lista nominal de 2024.
+Las siguientes tablas resumen los seis perfiles: primero quiénes son y después cómo votan. Las cifras de población corresponden a la lista nominal de 2024.
 
-| # | Nombre | Población | % | Participación media (%) | Extra en presidenciales (pts) | Cambio por elección (pts) | % mujeres | Edad predominante | Asignación clara (%) |
-|---|---|---|---|---|---|---|---|---|---|
-| 0 | Por convencer | 15.3M | 21.4 | 37.3 | +14.3 | +1.1 | 25 | 30-39 | 92 |
-| 1 | Constancia que se apaga | 5.9M | 8.3 | 48.5 | +7.6 | -1.6 | 44 | 30-39 | 44 |
-| 2 | Generación en ascenso | 13.3M | 18.6 | 50.5 | +18.4 | +3.0 | 53 | 30-39 | 59 |
-| 3 | Paso firme | 11.6M | 16.3 | 60.3 | +9.3 | -0.1 | 57 | 40-49 | 57 |
-| 4 | Voces que avanzan | 8.4M | 11.8 | 62.0 | +19.5 | +4.5 | 68 | 40-49 | 51 |
-| 5 | Pilar democrático | 16.7M | 23.5 | 72.8 | +10.6 | +1.8 | 69 | 50-59 | 82 |
+| # | Nombre | Población | % | % mujeres | Edad predominante |
+|---|---|---|---|---|---|
+| 0 | Por convencer | 15.3M | 21.4 | 25 | 30-39 |
+| 1 | Constancia que se apaga | 5.9M | 8.3 | 44 | 30-39 |
+| 2 | Generación en ascenso | 13.3M | 18.6 | 53 | 30-39 |
+| 3 | Paso firme | 11.6M | 16.3 | 57 | 40-49 |
+| 4 | Voces que avanzan | 8.4M | 11.8 | 68 | 40-49 |
+| 5 | Pilar democrático | 16.7M | 23.5 | 69 | 50-59 |
+
+| # | Nombre | Participación media (%) | Extra en presidenciales (pts) | Cambio por elección (pts) | Asignación clara (%) |
+|---|---|---|---|---|---|
+| 0 | Por convencer | 37.3 | +14.3 | +1.1 | 92 |
+| 1 | Constancia que se apaga | 48.5 | +7.6 | -1.6 | 44 |
+| 2 | Generación en ascenso | 50.5 | +18.4 | +3.0 | 59 |
+| 3 | Paso firme | 60.3 | +9.3 | -0.1 | 57 |
+| 4 | Voces que avanzan | 62.0 | +19.5 | +4.5 | 51 |
+| 5 | Pilar democrático | 72.8 | +10.6 | +1.8 | 82 |
 
 ### 4.1 Descripción de los perfiles
 
