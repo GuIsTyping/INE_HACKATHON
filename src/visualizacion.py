@@ -73,10 +73,10 @@ TRAMOS_ESC = ["<8", "8-10", "10-12", "12+"]
 NOMBRES = {
     0: "Por convencer",
     1: "Constancia que se apaga",
-    2: "Generacion en ascenso",
+    2: "Generación en ascenso",
     3: "Paso firme",
     4: "Voces que avanzan",
-    5: "Pilar democratico",
+    5: "Pilar democrático",
 }
 COLORES_PERFIL = ["#c0392b", "#e67e22", "#d4a017", "#5dade2", "#2e86c1", "#1e8449"]
 COLOR_SIN_DATOS = "#d9d9d9"
@@ -92,8 +92,8 @@ DPI_FICHA = 200
 UMBRAL_INDICE = 1.4
 UMBRAL_SEXO = 60
 BANDAS_EDAD = {
-    "18-24": "jovenes (18-24)", "25-29": "adultos jovenes (25-39)",
-    "30-39": "adultos jovenes (25-39)", "40-49": "adultos (40-59)",
+    "18-24": "jóvenes (18-24)", "25-29": "adultos jóvenes (25-39)",
+    "30-39": "adultos jóvenes (25-39)", "40-49": "adultos (40-59)",
     "50-59": "adultos (40-59)", "60-69": "mayores (60+)",
     "70-79": "mayores (60+)", "80+": "mayores (60+)",
 }
@@ -101,12 +101,12 @@ BANDAS_EDAD = {
 EDONOM = {
     1: "Aguascalientes", 2: "Baja California", 3: "Baja California Sur",
     4: "Campeche", 5: "Coahuila", 6: "Colima", 7: "Chiapas", 8: "Chihuahua",
-    9: "Ciudad de Mexico", 10: "Durango", 11: "Guanajuato", 12: "Guerrero",
-    13: "Hidalgo", 14: "Jalisco", 15: "Mexico", 16: "Michoacan", 17: "Morelos",
-    18: "Nayarit", 19: "Nuevo Leon", 20: "Oaxaca", 21: "Puebla", 22: "Queretaro",
-    23: "Quintana Roo", 24: "San Luis Potosi", 25: "Sinaloa", 26: "Sonora",
+    9: "Ciudad de México", 10: "Durango", 11: "Guanajuato", 12: "Guerrero",
+    13: "Hidalgo", 14: "Jalisco", 15: "México", 16: "Michoacán", 17: "Morelos",
+    18: "Nayarit", 19: "Nuevo León", 20: "Oaxaca", 21: "Puebla", 22: "Querétaro",
+    23: "Quintana Roo", 24: "San Luis Potosí", 25: "Sinaloa", 26: "Sonora",
     27: "Tabasco", 28: "Tamaulipas", 29: "Tlaxcala", 30: "Veracruz",
-    31: "Yucatan", 32: "Zacatecas",
+    31: "Yucatán", 32: "Zacatecas",
 }
 
 ABREVIATURAS = {"GRAL": "GENERAL", "DR": "DOCTOR"}
@@ -150,9 +150,9 @@ def sobrerrepresentacion(df, grupo, dim, min_personas):
     t = df.groupby([grupo, dim])["peso"].sum().rename("personas").reset_index()
     t["pct_en_categoria"] = t["personas"] / t.groupby(dim)["personas"].transform("sum") * 100
     pct_nacional = df.groupby(grupo)["peso"].sum() / df["peso"].sum() * 100
-    t["índice"] = t["pct_en_categoria"] / t[grupo].map(pct_nacional) * 100
+    t["indice"] = t["pct_en_categoria"] / t[grupo].map(pct_nacional) * 100
     t = t[t["personas"] >= min_personas]
-    return t.sort_values([grupo, "índice"], ascending=[True, False]).reset_index(drop=True)
+    return t.sort_values([grupo, "indice"], ascending=[True, False]).reset_index(drop=True)
 
 
 def normalizar(s):
@@ -264,13 +264,13 @@ def generar_descriptores(celdas, res_perfil, K):
 
     def nombre_auto(r):
         if r["promedio"] < 45:
-            partes = ["Baja participacion"]
+            partes = ["Baja participación"]
         elif r["promedio"] < 55:
-            partes = ["Participacion media"]
+            partes = ["Participación media"]
         elif r["promedio"] < 65:
-            partes = ["Participacion media-alta"]
+            partes = ["Participación media-alta"]
         else:
-            partes = ["Alta participacion"]
+            partes = ["Alta participación"]
         if r["brecha_pres"] >= 17:
             partes.append("se moviliza en presidenciales")
         elif r["brecha_pres"] <= 10:
@@ -298,9 +298,9 @@ def generar_descriptores(celdas, res_perfil, K):
         if idx_edad.loc[p].max() >= UMBRAL_INDICE:
             rasgos.append(idx_edad.loc[p].idxmax())
         if pct_sexo.loc[p].max() >= UMBRAL_SEXO:
-            rasgos.append(f"mayoria {pct_sexo.loc[p].idxmax()}")
+            rasgos.append(f"mayoría {pct_sexo.loc[p].idxmax()}")
         if "R" in idx_tipo.columns and idx_tipo.loc[p, "R"] >= UMBRAL_INDICE:
-            rasgos.append("mas rural")
+            rasgos.append("más rural")
         if idx_region.loc[p].max() >= UMBRAL_INDICE:
             rasgos.append(f"fuerte en el {idx_region.loc[p].idxmax()}")
         return rasgos
@@ -330,7 +330,7 @@ def cruzar_municipios(celdas, gdf_mun):
     ine_unico = ~mun_ine.duplicated(["EDOCVE", "nom"], keep=False).to_numpy()
     cruce = mun_ine.merge(geo_unicos[["EDOCVE", "nom", "CVEGEO"]], on=["EDOCVE", "nom"], how="left")
     cruce.loc[~ine_unico, "CVEGEO"] = np.nan
-    cruce["método"] = np.where(cruce["CVEGEO"].notna(), "exacto", "sin cruce")
+    cruce["metodo"] = np.where(cruce["CVEGEO"].notna(), "exacto", "sin cruce")
 
     for i in cruce.index[cruce["CVEGEO"].isna() & ine_unico]:
         e, nom = cruce.at[i, "EDOCVE"], cruce.at[i, "nom"]
@@ -341,17 +341,17 @@ def cruzar_municipios(celdas, gdf_mun):
         contiene = libres[libres["nom"].map(lambda x, n=nom: n in x or x in n)]
         if len(contiene) == 1:
             cruce.at[i, "CVEGEO"] = contiene["CVEGEO"].iloc[0]
-            cruce.at[i, "método"] = "contenido"
+            cruce.at[i, "metodo"] = "contenido"
             continue
         if len(contiene) > 1:
             continue
         cand = difflib.get_close_matches(nom, libres["nom"].tolist(), n=1, cutoff=0.6)
         if cand:
             cruce.at[i, "CVEGEO"] = libres.loc[libres["nom"] == cand[0], "CVEGEO"].iloc[0]
-            cruce.at[i, "método"] = "aproximado"
+            cruce.at[i, "metodo"] = "aproximado"
 
     cruce = cruce.merge(geo[["CVEGEO", "NOMGEO"]], on="CVEGEO", how="left")
-    print(f"  Cruce: {cruce['método'].value_counts().to_dict()}")
+    print(f"  Cruce: {cruce['metodo'].value_counts().to_dict()}")
     return cruce
 
 
@@ -368,8 +368,8 @@ def generar_vista_general(res_perfil, tray_perfil, nac_tray, K):
         ax1.plot(ANOS, tray_perfil.loc[p].to_numpy(), "o-", color=COLORES_PERFIL[p], linewidth=2.5,
                  label=f"P{p} ({res_perfil.loc[p, 'pct_pob']:.0f}%)")
     ax1.set_xticks(ANOS)
-    ax1.set_ylabel("% participacion (ponderada)")
-    ax1.set_title("Trayectoria de participacion por perfil")
+    ax1.set_ylabel("% participación (ponderada)")
+    ax1.set_title("Trayectoria de participación por perfil")
     ax1.grid(axis="y", alpha=0.3)
     ax1.legend(fontsize=9, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.08), frameon=False)
 
@@ -378,7 +378,7 @@ def generar_vista_general(res_perfil, tray_perfil, nac_tray, K):
                     color=COLORES_PERFIL[p], alpha=0.85, edgecolor="#333", linewidth=0.8)
         ax2.annotate(f"P{p}", (r["promedio"], r["brecha_pres"]), ha="center", va="center",
                      fontsize=11, fontweight="bold", color="white")
-    ax2.set_xlabel("Promedio de participacion 2009-2024 (%)")
+    ax2.set_xlabel("Promedio de participación 2009-2024 (%)")
     ax2.set_ylabel("Brecha presidencial (puntos)")
     ax2.set_title("Nivel contra sensibilidad a presidenciales")
     ax2.grid(alpha=0.3)
@@ -439,21 +439,21 @@ def panel_metricas(ax, r, n_sub, nac_esc, nac_internet):
     """Panel de texto con las metricas clave del perfil."""
     ax.axis("off")
     items = [
-        ("PARTICIPACION", None),
+        ("PARTICIPACIÓN", None),
         ("Promedio 2009-2024", f"{r['promedio']:.1f}%"),
         ("Brecha presidencial", f"{r['brecha_pres']:+.1f} pts"),
         ("Tendencia", f"{r['tendencia']:+.2f} pts/elec."),
         ("Judicial 2025", f"{r['P_PJ2025']:.1f}%"),
-        ("COMPOSICION", None),
+        ("COMPOSICIÓN", None),
         ("Mujeres", f"{r['MUJER']:.0f}%"),
-        ("Menores de 40 anos", f"{r['MENOR_40']:.0f}%"),
-        ("Seccion rural o mixta", f"{r['RURAL_MIXTA']:.0f}%"),
-        ("CONTEXTO DE LA SECCION", None),
+        ("Menores de 40 años", f"{r['MENOR_40']:.0f}%"),
+        ("Sección rural o mixta", f"{r['RURAL_MIXTA']:.0f}%"),
+        ("CONTEXTO DE LA SECCIÓN", None),
         ("Escolaridad (grados)", f"{r['escolaridad']:.1f} (nac. {nac_esc:.1f})"),
-        ("Con educacion posbasica", f"{r['pct_posbasica']:.0f}%"),
+        ("Con educación posbásica", f"{r['pct_posbasica']:.0f}%"),
         ("Viviendas con internet", f"{r['pct_internet']:.0f}% (nac. {nac_internet:.0f}%)"),
         ("MODELO", None),
-        ("Asignacion clara (p >= 0.8)", f"{r['CLARA']:.0f}%"),
+        ("Asignación clara (p >= 0.8)", f"{r['CLARA']:.0f}%"),
         ("Subperfiles", f"{n_sub}"),
     ]
     y = 0.98
@@ -533,7 +533,7 @@ def generar_fichas(celdas, res_perfil, res_sub, tray_perfil, nac_tray,
                 ax.annotate(f"{v:.1f}", (a, v), textcoords="offset points", xytext=(0, 9),
                             ha="center", fontsize=9, fontweight="bold")
             ax.set_xticks(ANOS)
-            ax.set_ylabel("% participacion")
+            ax.set_ylabel("% participación")
             ax.set_ylim(max(0, min(tray.min(), min(nac_tray)) - 8),
                          min(100, max(tray.max(), max(nac_tray)) + 8))
             ax.set_title("Trayectoria 2009-2024", fontsize=11)
@@ -553,7 +553,7 @@ def generar_fichas(celdas, res_perfil, res_sub, tray_perfil, nac_tray,
             reg = dp.groupby("REGION")["peso"].sum().reindex(REGIONES_ORDEN, fill_value=0)
             reg = reg / dp["peso"].sum() * 100
             barras_vs_nacional(fig.add_subplot(gs[1, 1]), REGIONES_ORDEN,
-                               reg.to_numpy(), nac_reg.to_numpy(), color, "Region (gris = nacional)")
+                               reg.to_numpy(), nac_reg.to_numpy(), color, "Región (gris = nacional)")
 
             # Escolaridad
             esc = dp.groupby("tramo_esc")["peso"].sum().reindex(TRAMOS_ESC, fill_value=0)
@@ -561,7 +561,7 @@ def generar_fichas(celdas, res_perfil, res_sub, tray_perfil, nac_tray,
             barras_vs_nacional(fig.add_subplot(gs[1, 2]),
                                [f"{t} grados" for t in TRAMOS_ESC], esc.to_numpy(),
                                nac_esc_tramo.to_numpy(), color,
-                               "Escolaridad de la seccion (gris = nacional)")
+                               "Escolaridad de la sección (gris = nacional)")
 
             # Mapa de presencia
             ax = fig.add_subplot(gs[2, 1:])
@@ -572,19 +572,19 @@ def generar_fichas(celdas, res_perfil, res_sub, tray_perfil, nac_tray,
                                           vmax=float(np.nanpercentile(gmun[col], 98)), linewidth=0)
             gdf_edo.boundary.plot(ax=ax, color="white", linewidth=0.3)
             ax.set_axis_off()
-            ax.set_title("Presencia por municipio (% de su poblacion)", fontsize=11)
+            ax.set_title("Presencia por municipio (% de su población)", fontsize=11)
 
             # Entidades sobrerrepresentadas
             ax = fig.add_subplot(gs[2, 0])
             top = ent_perfil[ent_perfil["perfil"] == p].head(8)
             yp = np.arange(len(top))
-            ax.barh(yp, top["índice"], color=color, alpha=0.85, height=0.6)
+            ax.barh(yp, top["indice"], color=color, alpha=0.85, height=0.6)
             ax.axvline(100, color="#555", linestyle="--", linewidth=1)
-            for i, v in enumerate(top["índice"]):
+            for i, v in enumerate(top["indice"]):
                 ax.text(v + 3, i, f"{v:.0f}", va="center", fontsize=9)
-            ax.set_yticks(yp, top["entidad"].replace({"Ciudad de Mexico": "CDMX"}))
+            ax.set_yticks(yp, top["entidad"].replace({"Ciudad de México": "CDMX"}))
             ax.invert_yaxis()
-            ax.set_xlim(0, top["índice"].max() * 1.2)
+            ax.set_xlim(0, top["indice"].max() * 1.2)
             ax.set_title("Entidades sobrerrepresentadas (100 = nacional)", fontsize=11)
 
             # Tabla de subperfiles
@@ -627,7 +627,7 @@ def popup_municipio(r, K):
         f'<div style="font-family:Arial;font-size:12px;width:230px;">'
         f'<b style="font-size:13px;">{r["NOMGEO"]}</b><br>'
         f'<span style="color:#666;">{EDONOM[r["EDOCVE"]]}</span><br>'
-        f'{r["personas"]:,.0f} personas | participacion media {r["promedio"]:.1f}%<br>'
+        f'{r["personas"]:,.0f} personas | participación media {r["promedio"]:.1f}%<br>'
         f'Escolaridad media {r["escolaridad"]:.1f} grados | '
         f'{r["pct_internet"]:.0f}% viviendas con internet<br>'
         f'{barras_html(r, K)}'
@@ -641,7 +641,7 @@ def popup_entidad(r, K):
     return (
         f'<div style="font-family:Arial;font-size:12px;width:230px;">'
         f'<b style="font-size:13px;">{EDONOM[r["EDOCVE"]]}</b><br>'
-        f'{r["personas"]:,.0f} personas | participacion media {r["promedio"]:.1f}%<br>'
+        f'{r["personas"]:,.0f} personas | participación media {r["promedio"]:.1f}%<br>'
         f'Escolaridad media {r["escolaridad"]:.1f} grados | '
         f'{r["pct_internet"]:.0f}% viviendas con internet<br>'
         f'{barras_html(r, K)}</div>'
@@ -739,7 +739,7 @@ def panel_html(res_perfil, tray_perfil, nac_tray, descriptores,
         'overflow-y:auto;scrollbar-width:thin;">'
         '<div style="position:sticky;top:0;background:white;padding:10px 14px 8px;'
         'font-weight:bold;font-size:13px;border-bottom:1px solid #eee;'
-        'border-radius:10px 10px 0 0;z-index:1;">Perfiles de participacion</div>'
+        'border-radius:10px 10px 0 0;z-index:1;">Perfiles de participación</div>'
         '<div style="padding:6px 10px 10px;">'
     )
     nac_e = nac_edad
@@ -790,18 +790,18 @@ def panel_html(res_perfil, tray_perfil, nac_tray, descriptores,
             f'Trayectoria 2009-2024 <span style="color:#ccc;">gris = nacional</span></div>'
             f'{_svg_trayectoria(tray, nac_tray, c)}</div>'
             f'<div style="margin-bottom:8px;"><div style="font-size:9px;color:#999;margin-bottom:2px;">'
-            f'Genero</div>{_svg_genero(r["MUJER"], c)}</div>'
+            f'Género</div>{_svg_genero(r["MUJER"], c)}</div>'
             f'<div style="margin-bottom:8px;"><div style="font-size:9px;color:#999;margin-bottom:2px;">'
             f'Edad <span style="color:#ccc;">gris = nacional</span></div>'
             f'{_svg_barras(ETIQUETAS_EDAD, dist_edad[p], nac_e, c, ml=45)}</div>'
             f'<div style="margin-bottom:8px;"><div style="font-size:9px;color:#999;margin-bottom:2px;">'
-            f'Region <span style="color:#ccc;">gris = nacional</span></div>'
+            f'Región <span style="color:#ccc;">gris = nacional</span></div>'
             f'{_svg_barras(REGIONES_ORDEN, dist_region[p], nac_r, c, ml=72)}</div>'
             f'<div style="margin-bottom:8px;"><div style="font-size:9px;color:#999;margin-bottom:2px;">'
             f'Escolaridad <span style="color:#ccc;">gris = nacional</span></div>'
             f'{_svg_barras([f"{t} gr." for t in TRAMOS_ESC], dist_esc[p], nac_es, c, ml=50)}'
             f'<div style="margin-top:3px;color:#666;">{r["escolaridad"]:.1f} grados prom. &middot; '
-            f'{r["pct_posbasica"]:.0f}% posbasica &middot; {r["pct_internet"]:.0f}% internet</div></div>'
+            f'{r["pct_posbasica"]:.0f}% posbásica &middot; {r["pct_internet"]:.0f}% internet</div></div>'
         )
 
         html += (

@@ -107,20 +107,28 @@ def descargar(url: str, destino: Path):
     resp = requests.get(url, stream=True, timeout=300)
     resp.raise_for_status()
     total = int(resp.headers.get("content-length", 0))
-    with open(destino, "wb") as f:
+    # Temporal y renombrado: una descarga interrumpida no cuenta como archivo existente
+    tmp = destino.with_name(destino.name + ".tmp")
+    with open(tmp, "wb") as f:
         with tqdm(total=total, unit="B", unit_scale=True, desc=destino.name) as bar:
             for chunk in resp.iter_content(chunk_size=8192):
                 f.write(chunk)
                 bar.update(len(chunk))
+    tmp.replace(destino)
 
 
 def extraer_zip(zip_path: Path, destino: Path):
-    csvs = list(destino.rglob("*.csv"))
-    if csvs:
-        print(f"  {destino.name}: ya extraido ({len(csvs)} CSVs)")
-        return
-    print(f"  Extrayendo {zip_path.name} -> {destino.name}/")
     with zipfile.ZipFile(zip_path, "r") as zf:
+        miembros = [m for m in zf.infolist() if not m.is_dir()]
+        completo = all(
+            (destino / m.filename).exists()
+            and (destino / m.filename).stat().st_size == m.file_size
+            for m in miembros
+        )
+        if completo:
+            print(f"  {destino.name}: ya extraido ({len(miembros)} archivos)")
+            return
+        print(f"  Extrayendo {zip_path.name} -> {destino.name}/")
         zf.extractall(destino)
     csvs = list(destino.rglob("*.csv"))
     print(f"  {len(csvs)} CSVs extraidos.")

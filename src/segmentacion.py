@@ -106,6 +106,13 @@ MIN_PERSONAS_MPIO = 1_000
 # Funciones auxiliares compartidas
 # ===================================================================
 
+def guardar_parquet(df, salida):
+    """Escribe a un temporal y renombra: una corrida interrumpida no deja un parquet a medias."""
+    tmp = salida.with_suffix(".parquet.tmp")
+    df.to_parquet(tmp, index=False)
+    tmp.replace(salida)
+
+
 def media_ponderada(df, col, por):
     """Promedio ponderado por peso, agrupado por las columnas en `por`."""
     grupos = [df[c] for c in por]
@@ -282,7 +289,7 @@ def etapa_lca(celdas):
         filas.append({
             "K": K, "loglik": m["ll"], "n_parametros": n_par,
             "BIC": bic, "AIC": -2 * m["ll"] + 2 * n_par,
-            "entropía": ent, "pct_min": m["pi"].min() * 100,
+            "entropia": ent, "pct_min": m["pi"].min() * 100,
         })
         print(f"BIC={bic:.0f}  entropia={ent:.3f}  min_clase={m['pi'].min()*100:.1f}%")
 
@@ -329,10 +336,10 @@ def etapa_lca(celdas):
     for j, c in enumerate(ELECCIONES):
         clases[f"p_alta_{c}"] = pd.Series(theta[:, j, C - 1], index=range(K_ELEGIDO)).round(3)
 
-    # Guardar
-    celdas[LLAVES + ["peso", "clase", "prob_clase"]].to_parquet(salida, index=False)
+    # Guardar: el parquet al final, porque su existencia indica que la etapa termino
     df_k.to_csv(DIR_PREPROCESSED / "lca_seleccion_k.csv", index=False)
     clases.to_csv(DIR_PREPROCESSED / "lca_clases.csv")
+    guardar_parquet(celdas[LLAVES + ["peso", "clase", "prob_clase"]], salida)
     print(f"  Guardado: {salida.name}, lca_seleccion_k.csv, lca_clases.csv")
 
 
@@ -349,10 +356,10 @@ def sobrerrepresentacion(df, dim, min_personas, top=3):
     t = df.groupby(["subperfil", dim])["peso"].sum().rename("personas").reset_index()
     t["pct_en_categoria"] = t["personas"] / t.groupby(dim)["personas"].transform("sum") * 100
     pct_nacional = df.groupby("subperfil")["peso"].sum() / df["peso"].sum() * 100
-    t["índice"] = t["pct_en_categoria"] / t["subperfil"].map(pct_nacional) * 100
+    t["indice"] = t["pct_en_categoria"] / t["subperfil"].map(pct_nacional) * 100
     t = t[t["personas"] >= min_personas]
-    return t.sort_values("índice", ascending=False).groupby("subperfil").head(top).sort_values(
-        ["subperfil", "índice"], ascending=[True, False]
+    return t.sort_values("indice", ascending=False).groupby("subperfil").head(top).sort_values(
+        ["subperfil", "indice"], ascending=[True, False]
     )
 
 
@@ -360,7 +367,7 @@ def resumen_subperfiles(celdas, por):
     """Resumen ponderado por subperfil."""
     personas = celdas.groupby(por)["peso"].sum()
     out = pd.DataFrame({"personas": personas, "pct_pob": personas / celdas["peso"].sum() * 100})
-    for col in ["promedio", "brecha_pres", "tendencia", "desviación", "P_PJ2025", "MUJER", "RURAL_MIXTA"]:
+    for col in ["promedio", "brecha_pres", "tendencia", "desviacion", "P_PJ2025", "MUJER", "RURAL_MIXTA"]:
         if col in celdas.columns:
             out[col] = media_ponderada(celdas, col, por)
     out[["MUJER", "RURAL_MIXTA"]] *= 100
@@ -472,7 +479,7 @@ def etapa_subperfiles(celdas):
     tipo = sobrerrepresentacion(celdas, "persona_tipo", MIN_PERSONAS_TIPO)
 
     def como_texto(t, etiqueta):
-        txt = t[etiqueta] + " (" + t["índice"].round(0).astype(int).astype(str) + ")"
+        txt = t[etiqueta] + " (" + t["indice"].round(0).astype(int).astype(str) + ")"
         return txt.groupby(t["subperfil"]).agg(", ".join)
 
     micro = tabla_sub[["pct_pob", "promedio", "brecha_pres", "tendencia"]].reset_index()
@@ -489,13 +496,13 @@ def etapa_subperfiles(celdas):
     municipios["entidad"] = municipios["EDOCVE"].map(EDONOM)
     municipios = municipios.rename(columns={"peso": "personas_sub"})
 
-    # Guardar
-    celdas[LLAVES + ["peso", "perfil", "subperfil"]].to_parquet(salida, index=False)
+    # Guardar: el parquet al final, porque su existencia indica que la etapa termino
     tabla_sub.to_csv(DIR_PREPROCESSED / "subperfiles_resumen.csv")
     micro.to_csv(DIR_PREPROCESSED / "subperfiles_microtargeting.csv", index=False)
     ent.to_csv(DIR_PREPROCESSED / "subperfiles_entidades.csv", index=False)
     tipo.to_csv(DIR_PREPROCESSED / "subperfiles_personas_tipo.csv", index=False)
     municipios.to_csv(DIR_PREPROCESSED / "subperfiles_municipios.csv", index=False)
+    guardar_parquet(celdas[LLAVES + ["peso", "perfil", "subperfil"]], salida)
 
     print(f"  Municipios con datos suficientes: {len(municipios):,}")
     print("  Guardados: celdas_subperfiles.parquet + 5 CSVs de resumen")

@@ -32,7 +32,7 @@ Participar en el **Reto 1: Perfiles ciudadanos de participación** (Eje: Segment
 2. ~~Caracterizar cada grupo~~ (completado: edad, sexo, escolaridad, internet, región, historial)
 3. ~~Nombrar y describir cada perfil~~ (completado: fichas PNG/PDF, mapa interactivo)
 4. ~~Proponer estrategias diferenciadas~~ (completado: `DATA/DOCS/estrategias_por_perfil.md`)
-5. ~~Documento técnico~~ (contenido completo en `DATA/DOCS/documento_tecnico.md`, ~10 cuartillas estimadas en Arial 11). El PDF (Calibri 11, interlineado 1.5) se genera fuera del repositorio y debe regenerarse desde el .md actual; verificar que quede en 8-12 cuartillas
+5. ~~Documento técnico~~ (fuente: `DATA/DOCS/documento_tecnico.md`; PDF: `DATA/DOCS/documento_tecnico.pdf`, 11 páginas, carta, Arial 11, interlineado 1.5 y tablas de 8-9 pt). El PDF se genera fuera del repositorio, no se versiona (`DATA/DOCS/*.pdf` está en `.gitignore`) y debe regenerarse si cambia el .md
 6. ~~Presentación ejecutiva~~ (completado: `DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
 7. Cartas firmadas (cesión de derechos + declaratoria) — pendiente (requiere firma del equipo)
 
@@ -58,7 +58,7 @@ Participar en el **Reto 1: Perfiles ciudadanos de participación** (Eje: Segment
 ```
 INE_HACKATHON/
   pyproject.toml              Entorno UV (dependencias reproducibles)
-  .python-versión             Versión de Python fijada (3.12)
+  .python-version             Versión de Python fijada (3.12)
   ejecutar_pipeline.sh          Ejecuta todo el pipeline de principio a fin
   src/
     descarga_inicial.py       Descarga y extraccion de todos los recursos
@@ -507,9 +507,9 @@ Pregunta: cambia la segmentación si el modelo de clases latentes recibe, ademá
 
 ## Scripts de Produccion (`src/`)
 
-Cuatro scripts standalone que reproducen el pipeline completo desde la descarga hasta las visualizaciones finales. Cada uno tiene logica skip-if-exists para ejecucion idempotente. Orden de ejecucion:
+Cuatro scripts standalone que reproducen el pipeline completo desde la descarga hasta las visualizaciones finales. `descarga_inicial.py`, `preprocesamiento.py` y `segmentacion.py` omiten lo que ya existe; `visualizacion.py` regenera siempre sus salidas. Descargas y parquets se escriben a un archivo temporal y se renombran al terminar, y la extraccion compara nombre y tamano contra el ZIP, de modo que una corrida interrumpida se puede repetir sin borrar nada. Orden de ejecucion:
 
-1. `descarga_inicial.py` — Descarga 9 ZIPs (conteos federales 2009-2024, PJ 2025, voto anticipado, prision preventiva, ECEG 2020), 4 PDFs y el shapefile municipal CONABIO. Extrae todo a sus directorios correspondientes.
+1. `descarga_inicial.py` — Descarga 10 ZIPs (conteos federales 2009-2024, PJ 2025, voto anticipado, prision preventiva, ECEG 2020), 4 PDFs y el shapefile municipal CONABIO. Extrae todo a sus directorios correspondientes.
 
 2. `preprocesamiento.py` — Tres etapas:
    - Consolidacion federal (PyArrow ParquetWriter, un row group por ano) + extras (PJ 2025, voto anticipado, prision preventiva)
@@ -528,6 +528,12 @@ Cuatro scripts standalone que reproducen el pipeline completo desde la descarga 
    - Cruce municipal por nombre normalizado (3 pasos: exacto, contenido, aproximado)
 
 Autoria en todos los scripts: Angel David Durazo Bartolini y Jehu Jonathan Ramirez Ramirez.
+
+### Compatibilidad con los notebooks
+
+Scripts y notebooks usan los mismos nombres de columna, sin acento (`SECCION`, `REGION`, `desviacion`, `indice`, `metodo`, `entropia`), y producen los mismos resultados, por lo que se pueden mezclar: los notebooks 08 a 11 corren sobre los parquets del script. El notebook 01 no descarga la ECEG 2020 ni el shapefile: se obtienen con `descarga_inicial.py`.
+
+Verificado en clon limpio: `.sh` y notebooks 01-04 y 07-11 dan clases, subperfiles e historial identicos a las salidas de referencia. Los notebooks 05 y 06 no se reejecutaron (~19 y ~37 min).
 
 ### Script de ejecucion completa
 
@@ -557,7 +563,9 @@ Autoria en todos los scripts: Angel David Durazo Bartolini y Jehu Jonathan Ramir
 - [x] Segmentación final: clases latentes (notebook 08, k=6) con subperfiles del 09
 - [x] Nombres definitivos de los perfiles (`NOMBRES` en el 11)
 - [x] Propuesta de estrategias (`DATA/DOCS/estrategias_por_perfil.md`)
-- [x] Documento técnico (`DATA/DOCS/documento_tecnico.pdf`, 10 páginas)
+- [x] Documento técnico (`DATA/DOCS/documento_tecnico.pdf`, 11 páginas)
 - [x] Fichas de perfil (`DATA/PREPROCESSED/fichas/`)
 - [x] Presentación ejecutiva (`DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
 - [x] Scripts de produccion (`src/descarga_inicial.py`, `preprocesamiento.py`, `segmentacion.py`, `visualizacion.py`)
+- [ ] Cartas firmadas (requieren la firma del equipo)
+- [ ] Envío a grecia.castro@ine.mx y cirse.rodriguez@ine.mx (31 oct 2026, 23:59 hrs)

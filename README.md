@@ -6,10 +6,28 @@ Reto 1: Segmentación sociodemográfica de la participación ciudadana a partir 
 
 ## Requisitos
 
-- [UV](https://docs.astral.sh/uv/) (gestor de entornos Python)
-- Python 3.12+
+- Bash (en Windows, Git Bash) e internet
+- [UV](https://docs.astral.sh/uv/) (gestor de entornos Python). `ejecutar_pipeline.sh` lo instala si falta, con `curl` o `wget`
+- Unos 6 GB libres en disco
 
-## Instalación
+## Ejecución completa
+
+```bash
+git clone https://github.com/GuIsTyping/INE_HACKATHON.git
+cd INE_HACKATHON
+./ejecutar_pipeline.sh
+```
+
+Instala el entorno, descarga los datos, ejecuta los cuatro scripts de `src/` y levanta un servidor local. Tarda unos 4 minutos y termina con el enlace al mapa interactivo: `http://localhost:8765/mapa_clases_latentes.html`. Se detiene con Ctrl+C.
+
+| Paso | Script | Qué hace |
+|---|---|---|
+| 1 | `src/descarga_inicial.py` | Descarga y extrae datos, PDFs y shapefile |
+| 2 | `src/preprocesamiento.py` | Consolida a Parquet, historial por sección y celda, ECEG |
+| 3 | `src/segmentacion.py` | Clases latentes y subperfiles |
+| 4 | `src/visualizacion.py` | Fichas, mapas y tablas |
+
+## Instalación manual
 
 ```bash
 git clone https://github.com/GuIsTyping/INE_HACKATHON.git
@@ -29,7 +47,7 @@ Los datos NO están incluidos en el repositorio (son ~4 GB de CSVs). Hay dos for
 uv run python src/descarga_inicial.py
 ```
 
-Descarga los 9 ZIPs del INE, los extrae y descarga los PDFs de referencia.
+Descarga los 10 ZIPs (9 del INE y la ECEG 2020 del INEGI), el shapefile municipal y los PDFs de referencia, y extrae los datos.
 
 ### Opción B: Notebook interactivo
 
@@ -37,9 +55,9 @@ Descarga los 9 ZIPs del INE, los extrae y descarga los PDFs de referencia.
 uv run jupyter notebook notebooks/01_ingesta_datos.ipynb
 ```
 
-Ejecuta las celdas en orden. Además de descargar y extraer, consolida los CSVs en archivos Parquet listos para análisis.
+Ejecuta las celdas en orden. Además de descargar y extraer, consolida los CSVs en archivos Parquet listos para análisis. No descarga la ECEG 2020 ni el shapefile, que necesitan los notebooks 10 y 11: esos se obtienen con la opción A.
 
-## Orden de ejecución
+## Orden de ejecución de los notebooks
 
 | Paso | Archivo | Qué hace |
 |---|---|---|
@@ -57,7 +75,7 @@ Ejecuta las celdas en orden. Además de descargar y extraer, consolida los CSVs 
 
 ## Mapa interactivo
 
-El notebook 11 genera un mapa interactivo en `DATA/PREPROCESSED/fichas/mapa_clases_latentes.html`. Los tiles del mapa (Stadia Maps) requieren servirse desde un servidor HTTP, no se pueden abrir directamente como archivo local.
+`ejecutar_pipeline.sh` y el notebook 11 generan un mapa interactivo en `DATA/PREPROCESSED/fichas/mapa_clases_latentes.html`. Los tiles del mapa (Stadia Maps) requieren servirse desde un servidor HTTP, no se pueden abrir directamente como archivo local.
 
 Para visualizar el mapa:
 
@@ -75,8 +93,12 @@ El mapa incluye capas municipal y estatal con el perfil dominante por territorio
 ```
 INE_HACKATHON/
   pyproject.toml              Dependencias (UV)
+  ejecutar_pipeline.sh        Ejecuta todo de principio a fin
   src/
-    descarga_inicial.py       Script de descarga y extracción
+    descarga_inicial.py       Descarga y extracción
+    preprocesamiento.py       Consolidación, historial y ECEG
+    segmentacion.py           Clases latentes y subperfiles
+    visualizacion.py          Fichas, mapas y tablas
   notebooks/
     01 a 11                   Pipeline completo (ingesta a visualización)
   DATA/
@@ -105,7 +127,7 @@ INE_HACKATHON/
 
 | Documento | Archivo |
 |---|---|
-| Documento técnico (10 páginas, Calibri 11) | `DATA/DOCS/documento_tecnico.md` / `.pdf` |
+| Documento técnico | `DATA/DOCS/documento_tecnico.md` (el PDF de 11 páginas se entrega aparte, no se versiona) |
 | Estrategias diferenciadas por perfil | `DATA/DOCS/estrategias_por_perfil.md` |
 | Presentación ejecutiva (10 diapositivas) | `DATA/DOCS/presentacion_ejecutiva.pptx` |
 | Fichas de perfil (PNG 200 dpi + PDF) | `DATA/PREPROCESSED/fichas/` |

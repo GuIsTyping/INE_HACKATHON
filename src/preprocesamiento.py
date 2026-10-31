@@ -94,6 +94,13 @@ COLUMNAS_ECEG = [
 # Etapa 1: Consolidacion de CSVs a Parquet
 # ===================================================================
 
+def guardar_parquet(df, salida):
+    """Escribe a un temporal y renombra: una corrida interrumpida no deja un parquet a medias."""
+    tmp = salida.with_suffix(".parquet.tmp")
+    df.to_parquet(tmp, index=False)
+    tmp.replace(salida)
+
+
 def consolidar_csvs(nombre):
     """Lee y concatena todos los CSVs de un dataset extraido."""
     carpeta = DIR_RAW / nombre
@@ -118,7 +125,8 @@ def consolidar_federal():
         print(f"  Ya existe: {salida.name} ({n:,} filas)")
         return
 
-    writer = pq.ParquetWriter(salida, SCHEMA_FEDERAL)
+    tmp = salida.with_suffix(".parquet.tmp")
+    writer = pq.ParquetWriter(tmp, SCHEMA_FEDERAL)
     total = 0
     for nombre in FEDERALES:
         df = consolidar_csvs(nombre)
@@ -130,6 +138,7 @@ def consolidar_federal():
         del df, table
         gc.collect()
     writer.close()
+    tmp.replace(salida)
     print(f"  Total: {total:,} filas ({salida.stat().st_size / 1024**2:.1f} MB)")
 
 
@@ -148,7 +157,7 @@ def consolidar_pj2025():
     for csv in tqdm(csvs, desc="conteosPJ2025"):
         partes.append(pd.read_csv(csv, encoding="utf-8-sig", dtype={"DEF": str, "CJ": str, "DEJ": str}))
     df = pd.concat(partes, ignore_index=True)
-    df.to_parquet(salida, index=False)
+    guardar_parquet(df, salida)
     print(f"  conteos_pj2025.parquet: {len(df):,} filas")
     del df
 
@@ -165,7 +174,7 @@ def consolidar_extras():
         csvs = sorted(carpeta.rglob("*.csv"))
         partes = [pd.read_csv(c, encoding="utf-8-sig") for c in csvs]
         df = pd.concat(partes, ignore_index=True)
-        df.to_parquet(salida, index=False)
+        guardar_parquet(df, salida)
         print(f"  {salida.name}: {len(df):,} filas")
 
 
@@ -202,7 +211,7 @@ def indicadores(ancha):
     x = np.arange(len(ANOS)) - (len(ANOS) - 1) / 2
     return pd.DataFrame({
         "promedio": valores.mean(axis=1),
-        "desviación": valores.std(axis=1, ddof=1),
+        "desviacion": valores.std(axis=1, ddof=1),
         "brecha_pres": (
             ancha[PRESIDENCIALES].mean(axis=1).to_numpy()
             - ancha[INTERMEDIAS].mean(axis=1).to_numpy()
@@ -262,9 +271,7 @@ def construir_historial_secciones(df):
     n = len(secciones)
     print(f"  Secciones con historial completo: {n:,}")
 
-    secciones.reset_index().to_parquet(
-        DIR_PREPROCESSED / "secciones_historial.parquet", index=False
-    )
+    guardar_parquet(secciones.reset_index(), DIR_PREPROCESSED / "secciones_historial.parquet")
     return secciones
 
 
@@ -303,7 +310,7 @@ def construir_historial_celdas(df, attr_2024):
     n = len(celdas)
     print(f"  Celdas con historial completo: {n:,}")
 
-    celdas.to_parquet(DIR_PREPROCESSED / "celdas_historial.parquet", index=False)
+    guardar_parquet(celdas, DIR_PREPROCESSED / "celdas_historial.parquet")
 
 
 def etapa_historial():
@@ -397,7 +404,7 @@ def etapa_eceg():
         "GRAPROES", "GRAPROES_F", "GRAPROES_M",
         "PCT_POSBASICA", "PCT_POSBASICA_F", "PCT_POSBASICA_M", "PCT_INTERNET",
     ]
-    eceg[columnas_salida].to_parquet(salida, index=False)
+    guardar_parquet(eceg[columnas_salida], salida)
     print(f"  {salida.name}: {len(eceg):,} secciones")
     print(f"  Secciones sin poblacion de 15+: {sin_poblacion.sum()}")
 
@@ -413,7 +420,7 @@ def main():
 
     print("\n=== Inventario de archivos generados ===")
     for f in sorted(DIR_PREPROCESSED.glob("*.parquet")):
-        n = pd.read_parquet(f, columns=[pd.read_parquet(f).columns[0]]).shape[0]
+        n = pq.ParquetFile(f).metadata.num_rows
         print(f"  {f.name}: {n:,} filas ({f.stat().st_size / 1024**2:.1f} MB)")
     print("\nPreprocesamiento completo.")
 
