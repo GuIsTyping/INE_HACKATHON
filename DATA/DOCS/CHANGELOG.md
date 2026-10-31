@@ -11,6 +11,7 @@
 - `documento_tecnico.md`: el indice de sobrerrepresentacion se expresa con 100 = nacional (decia 1,000); P1 pasa de tener "el" menor acceso a internet a "uno de los" menores (P5 49.12, P1 49.25). Mismo ajuste en `estrategias_por_perfil.md`
 - `documento_tecnico.pdf` generado desde el .md actual: 11 paginas, Arial 11, interlineado 1.5
 - README: ejecucion con `ejecutar_pipeline.sh`, 10 ZIPs, requisitos
+- `CLAUDE.md`: el estado actual ya no lista como pendientes pasos terminados
 
 ## 2026-10-30
 

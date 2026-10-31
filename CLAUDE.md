@@ -56,13 +56,6 @@ notebooks/              Jupyter notebooks (numerados por orden de ejecución)
 
 ## Estado actual
 
-La ingesta de datos esta completa. Los siguientes pasos pendientes son:
-
-- Idear 5 maneras innovadoras de abordar el problema
-- Diseño de metodología de segmentación / clustering
-- Implementación
-- Caracterización de perfiles
-- Propuesta de estrategias diferenciadas
-- Documento técnico, fichas de perfil, presentación ejecutiva
+Proyecto completo. Solo quedan pendientes las cartas firmadas y el envío.
 
 Consulta `DATA/DOCS/KNOWLEDGE_BASE.md` para detalles completos de datos, variables, indicadores y plataforma CCPC.
