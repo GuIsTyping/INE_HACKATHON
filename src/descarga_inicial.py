@@ -2,16 +2,19 @@
 Descarga inicial de todos los recursos del proyecto.
 
 Datasets de la plataforma CCPC del INE (ZIPs con CSVs), Estadisticas Censales
-a Escalas Geoelectorales 2020 del INEGI (indicadores del censo por seccion)
-y documentos informativos del hackaton (PDFs).
+a Escalas Geoelectorales 2020 del INEGI (indicadores del censo por seccion),
+shapefile municipal de CONABIO/INEGI y documentos informativos del hackaton (PDFs).
 
 Estructura de salida:
-    DATA/RAW/ZIPS/          ZIPs descargados
-    DATA/RAW/<dataset>/     CSVs extraidos por dataset
-    DATA/DOCS/              PDFs y documentos de referencia
+    DATA/RAW/ZIPS/                  ZIPs descargados
+    DATA/RAW/<dataset>/             CSVs extraidos por dataset
+    DATA/RAW/marco_geoestadistico/  Shapefile municipal 2022
+    DATA/DOCS/                      PDFs y documentos de referencia
 
 Uso:
     uv run python src/descarga_inicial.py
+
+Autores: Angel David Durazo Bartolini y Jehu Jonathan Ramirez Ramirez
 """
 
 import zipfile
@@ -104,20 +107,28 @@ def descargar(url: str, destino: Path):
     resp = requests.get(url, stream=True, timeout=300)
     resp.raise_for_status()
     total = int(resp.headers.get("content-length", 0))
-    with open(destino, "wb") as f:
+    # Temporal y renombrado: una descarga interrumpida no cuenta como archivo existente
+    tmp = destino.with_name(destino.name + ".tmp")
+    with open(tmp, "wb") as f:
         with tqdm(total=total, unit="B", unit_scale=True, desc=destino.name) as bar:
             for chunk in resp.iter_content(chunk_size=8192):
                 f.write(chunk)
                 bar.update(len(chunk))
+    tmp.replace(destino)
 
 
 def extraer_zip(zip_path: Path, destino: Path):
-    csvs = list(destino.rglob("*.csv"))
-    if csvs:
-        print(f"  {destino.name}: ya extraido ({len(csvs)} CSVs)")
-        return
-    print(f"  Extrayendo {zip_path.name} -> {destino.name}/")
     with zipfile.ZipFile(zip_path, "r") as zf:
+        miembros = [m for m in zf.infolist() if not m.is_dir()]
+        completo = all(
+            (destino / m.filename).exists()
+            and (destino / m.filename).stat().st_size == m.file_size
+            for m in miembros
+        )
+        if completo:
+            print(f"  {destino.name}: ya extraido ({len(miembros)} archivos)")
+            return
+        print(f"  Extrayendo {zip_path.name} -> {destino.name}/")
         zf.extractall(destino)
     csvs = list(destino.rglob("*.csv"))
     print(f"  {len(csvs)} CSVs extraidos.")

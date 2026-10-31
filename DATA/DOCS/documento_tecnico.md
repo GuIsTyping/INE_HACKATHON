@@ -106,7 +106,7 @@ Una vez formados los perfiles, los describimos con:
 
 - **Variables del CCPC:** edad (8 grupos), sexo, tipo de sección (urbana, mixta o rural), entidad federativa y región.
 - **ECEG 2020 (INEGI-INE):** grado promedio de escolaridad por sección y sexo, porcentaje con educación posbásica y porcentaje de viviendas con internet.
-- **Índice de sobrerrepresentación por entidad:** (% de la población del perfil que vive en la entidad) / (% de la población nacional que vive en ella) x 1000. Un índice de 1,000 indica una presencia proporcional; uno de 1,500, una presencia 50% mayor a la esperada.
+- **Índice de sobrerrepresentación por entidad:** (% de la población del perfil que vive en la entidad) / (% de la población nacional que vive en ella) x 100. Un índice de 100 indica una presencia proporcional; uno de 150, una presencia 50% mayor a la esperada.
 
 También probamos incluir 118 indicadores del censo como variables del modelo. Ninguno cambió de forma importante los perfiles (coincidencia de 0.80 o más con el modelo original en todas las variantes) ni se diferencia entre perfiles tanto como la edad: el perfil explica como máximo 8% de las diferencias en un indicador censal, contra 29% en la edad. Por eso los perfiles se forman solo con conducta electoral y las variables censales se usan para describirlos.
 
@@ -127,7 +127,7 @@ La siguiente tabla resume los seis perfiles. Las cifras de población correspond
 
 **P0 - Por convencer (15.3M, 21.4%).** La participación más baja (37.3%). Mayoritariamente masculino (75%) y joven (87% menor de 40 años). Concentrado en el Noroeste (Baja California, Sonora, Chihuahua). Vive en secciones con escolaridad media de 9.3 grados y 51% de viviendas con internet. Vota algo más en presidenciales y su tendencia es apenas positiva. Es el perfil más claramente definido: 92% de sus integrantes pertenece a él sin ambigüedad. Es el grupo más alejado de las urnas en todas las elecciones.
 
-**P1 - Constancia que se apaga (5.9M, 8.3%).** Participación intermedia (48.5%) y la brecha presidencial más baja (7.6 puntos): vota de manera pareja sin importar el tipo de elección. Pero viene en descenso (-1.6 puntos por elección) y es el único perfil con tendencia negativa. Vive en las secciones con menor escolaridad y acceso a internet (9.1 grados, 49%). Concentrado en Occidente (Jalisco, Guanajuato, Colima). Solo 44% de sus integrantes pertenece claramente a este perfil; el resto se parece también a otro perfil vecino, lo que es coherente con una población en transición.
+**P1 - Constancia que se apaga (5.9M, 8.3%).** Participación intermedia (48.5%) y la brecha presidencial más baja (7.6 puntos): vota de manera pareja sin importar el tipo de elección. Pero viene en descenso (-1.6 puntos por elección) y es el único perfil con tendencia negativa. Vive en las secciones con menor escolaridad (9.1 grados) y con uno de los accesos a internet más bajos (49%). Concentrado en Occidente (Jalisco, Guanajuato, Colima). Solo 44% de sus integrantes pertenece claramente a este perfil; el resto se parece también a otro perfil vecino, lo que es coherente con una población en transición.
 
 **P2 - Generación en ascenso (13.3M, 18.6%).** Participación media (50.5%) con una brecha presidencial marcada (+18.4) y la segunda tendencia ascendente más alta (+3.0): pasó de 36% en 2009 a 58% en 2024. Joven (66% menor de 40), equilibrado en género y predominantemente urbano (76%). En zonas urbanas vive en secciones con escolaridad alta (10.6 grados) y tiene el mayor acceso a internet (55%). Se moviliza en elecciones presidenciales pero se ausenta en las intermedias.
 
@@ -162,7 +162,7 @@ P0, P2 y P4 suman 52% de la población analizada y su participación en intermed
 
 ### 5.4 P1 es la señal de alerta
 
-Es el único perfil en descenso sostenido, el de asignación menos clara y el que vive en secciones con menor escolaridad y acceso a internet. Si la tendencia continúa, estos 5.9 millones de ciudadanos podrían acercarse al comportamiento de P0.
+Es el único perfil en descenso sostenido, el de asignación menos clara y el que vive en secciones con menor escolaridad y uno de los de menor acceso a internet. Si la tendencia continúa, estos 5.9 millones de ciudadanos podrían acercarse al comportamiento de P0.
 
 ## 6. Estrategias diferenciadas
 
@@ -179,7 +179,7 @@ Cada estrategia parte del diagnóstico del perfil: barrera, mensaje, canal, mome
 
 - **Barrera probable:** desencanto progresivo; participaban y están dejando de hacerlo.
 - **Mensaje:** reconocer su participación pasada y mostrar con datos locales que cada voto cuenta.
-- **Canal:** radio local, perifoneo y organizaciones comunitarias. Su acceso a internet es el más bajo (49%); lo digital es complementario.
+- **Canal:** radio local, perifoneo y organizaciones comunitarias. Su acceso a internet es de los más bajos (49%); lo digital es complementario.
 - **Momento y territorio:** vinculación cívica permanente, no solo en periodo electoral. Occidente (Jalisco, Guanajuato, Colima); el subperfil 1.1, que pierde 3.8 puntos por elección, es el caso más urgente.
 
 ### P2 - Generación en ascenso: sostener el impulso

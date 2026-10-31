@@ -32,7 +32,7 @@ Participar en el **Reto 1: Perfiles ciudadanos de participación** (Eje: Segment
 2. ~~Caracterizar cada grupo~~ (completado: edad, sexo, escolaridad, internet, región, historial)
 3. ~~Nombrar y describir cada perfil~~ (completado: fichas PNG/PDF, mapa interactivo)
 4. ~~Proponer estrategias diferenciadas~~ (completado: `DATA/DOCS/estrategias_por_perfil.md`)
-5. ~~Documento técnico~~ (contenido completo en `DATA/DOCS/documento_tecnico.md`, ~10 cuartillas estimadas en Arial 11). El PDF (Calibri 11, interlineado 1.5) se genera fuera del repositorio y debe regenerarse desde el .md actual; verificar que quede en 8-12 cuartillas
+5. ~~Documento técnico~~ (fuente: `DATA/DOCS/documento_tecnico.md`; PDF: `DATA/DOCS/documento_tecnico.pdf`, 11 páginas, carta, Arial 11, interlineado 1.5 y tablas de 8-9 pt). El PDF se genera fuera del repositorio, no se versiona (`DATA/DOCS/*.pdf` está en `.gitignore`) y debe regenerarse si cambia el .md
 6. ~~Presentación ejecutiva~~ (completado: `DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
 7. Cartas firmadas (cesión de derechos + declaratoria) — pendiente (requiere firma del equipo)
 
@@ -58,9 +58,13 @@ Participar en el **Reto 1: Perfiles ciudadanos de participación** (Eje: Segment
 ```
 INE_HACKATHON/
   pyproject.toml              Entorno UV (dependencias reproducibles)
-  .python-versión             Versión de Python fijada (3.12)
+  .python-version             Versión de Python fijada (3.12)
+  ejecutar_pipeline.sh          Ejecuta todo el pipeline de principio a fin
   src/
-    descarga_inicial.py       Script standalone de descarga y extracción
+    descarga_inicial.py       Descarga y extraccion de todos los recursos
+    preprocesamiento.py       Consolidacion a parquet, historial y ECEG
+    segmentacion.py           Clases latentes (LCA) y subperfiles anidados
+    visualizacion.py          Fichas PNG/PDF, mapas y tablas CSV
   notebooks/
     01_ingesta_datos.ipynb    Descarga, extracción y consolidación
     02_perfilado_datos.ipynb  Calidad, cobertura y participación por variable
@@ -122,12 +126,12 @@ Cada ZIP contiene un solo año de elección. 32 CSVs por entidad federativa.
 | conteos2021 | ~9.4M | 16 (estándar) | DERFE 2021 |
 | conteos2024 | ~9.8M | 16 (SEXO incluye 2=NB) | DERFE 2023 |
 
-Columnas estándar: AELEC, FELECCION, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCIÓN, TIPOSEC, DEF, DEL, SEXO, EDAD, LN, SV, NV, NS
+Columnas estándar: AELEC, FELECCION, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCION, TIPOSEC, DEF, DEL, SEXO, EDAD, LN, SV, NV, NS
 
 ### Dataset PJ 2025 (conteosPJ2025)
 
 - 31 CSVs, ~9.8M filas. No incluye Campeche (EDOCVE 4): `P_PJ2025` es nulo en todas sus secciones
-- Columnas: AELEC, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCIÓN, TIPOSEC, DEF, CJ, DEJ, SEXO, EDAD, LN, SV, NV, NS
+- Columnas: AELEC, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCION, TIPOSEC, DEF, CJ, DEJ, SEXO, EDAD, LN, SV, NV, NS
 - Diferencias: sin FELECCION, sin DEL; usa CJ (Circuito Judicial) y DEJ (Distrito Judicial Electoral)
 - Marco cartográfico: DERFE 2025
 
@@ -139,7 +143,7 @@ Columnas estándar: AELEC, FELECCION, EDOCVE, EDONOM, MPIOCVE, MPIONOM, SECCIÓN
 | FELECCION | Fecha de jornada electoral (no en PJ2025) |
 | EDOCVE/EDONOM | Clave y nombre de entidad federativa |
 | MPIOCVE/MPIONOM | Clave y nombre de municipio |
-| SECCIÓN | Sección electoral |
+| SECCION | Sección electoral |
 | TIPOSEC | Tipo de sección (U=Urbana, M=Mixta, R=Rural) |
 | DEF | Distrito Electoral Federal |
 | DEL | Distrito Electoral Local (no en PJ2025) |
@@ -186,7 +190,7 @@ El parquet federal se escribió con PyArrow ParquetWriter (un row group por año
 
 ### Cobertura
 - 32 entidades en todos los años federales (PJ 2025: 31, falta Campeche). Municipios 2,455-2,477; secciones 64,934 (2009) a 70,751 (2024).
-- 72,681 secciones distintas (EDOCVE + SECCIÓN); 62,048 (85%) presentes en las 6 elecciones federales.
+- 72,681 secciones distintas (EDOCVE + SECCION); 62,048 (85%) presentes en las 6 elecciones federales.
 
 ### Participación (SV / (SV + NV))
 | Año | 2009 | 2012 | 2015 | 2018 | 2021 | 2024 |
@@ -210,8 +214,8 @@ El parquet federal se escribió con PyArrow ParquetWriter (un row group por año
 ### Tablas para segmentación
 | Archivo | Unidad | Filas | Columnas clave |
 |---|---|---|---|
-| `secciones_historial.parquet` | EDOCVE + SECCIÓN | 54,892 | P2009..P2024, promedio, desviación, brecha_pres, tendencia, TIPOSEC, LN2024, REGIÓN, P_PJ2025 |
-| `celdas_historial.parquet` | EDOCVE + SECCIÓN + SEXO + GRUPO_EDAD | 657,497 | P2009..P2024, promedio, desviación, brecha_pres, tendencia, TIPOSEC, REGIÓN |
+| `secciones_historial.parquet` | EDOCVE + SECCION | 54,892 | P2009..P2024, promedio, desviación, brecha_pres, tendencia, TIPOSEC, LN2024, REGION, P_PJ2025 |
+| `celdas_historial.parquet` | EDOCVE + SECCION + SEXO + GRUPO_EDAD | 657,497 | P2009..P2024, promedio, desviación, brecha_pres, tendencia, TIPOSEC, REGION |
 
 - Indicadores: `promedio` (nivel), `desviacion` (estabilidad), `brecha_pres` (promedio 2012/2018/2024 - promedio 2009/2015/2021), `tendencia` (pendiente en puntos por elección).
 - Secciones: solo las que tienen tasa valida en las 6 elecciones (cubren 80M de 98M de LN 2024). 9,438 sección-año tienen todo el padrón en NS.
@@ -269,7 +273,7 @@ Los datos del CCPC no incluyen escolaridad, ingreso ni autoadscripcion indígena
 
 ### Mapa nacional interactivo
 
-Tiles CARTO CDN (light_all). Dos capas con folium LayerControl (esquina superior derecha):
+Tiles CartoDB positron. Dos capas con folium LayerControl (esquina superior derecha):
 1. **Estatal:** 32 entidades, perfil dominante con popup de distribución (nombre + porcentaje).
 2. **Municipal:** 2,475 municipios (1,858 con clustering local, 518 bloqueados por muestra <30 celdas).
    Popup con distribución de perfiles + clustering local con detalle demográfico (sexo, edad).
@@ -501,6 +505,40 @@ Pregunta: cambia la segmentación si el modelo de clases latentes recibe, ademá
 
 **Nota:** Los datos de población indígena y afromexicana están disponibles como FILTRO en los tableros interactivos pero NO aparecen como columna en los CSVs descargados. Por sección se pueden tomar de la ECEG 2020 (`PHOG_IND`, `POB_AFRO`).
 
+## Scripts de Produccion (`src/`)
+
+Cuatro scripts standalone que reproducen el pipeline completo desde la descarga hasta las visualizaciones finales. `descarga_inicial.py`, `preprocesamiento.py` y `segmentacion.py` omiten lo que ya existe; `visualizacion.py` regenera siempre sus salidas. Descargas y parquets se escriben a un archivo temporal y se renombran al terminar, y la extraccion compara nombre y tamano contra el ZIP, de modo que una corrida interrumpida se puede repetir sin borrar nada. Orden de ejecucion:
+
+1. `descarga_inicial.py` — Descarga 10 ZIPs (conteos federales 2009-2024, PJ 2025, voto anticipado, prision preventiva, ECEG 2020), 4 PDFs y el shapefile municipal CONABIO. Extrae todo a sus directorios correspondientes.
+
+2. `preprocesamiento.py` — Tres etapas:
+   - Consolidacion federal (PyArrow ParquetWriter, un row group por ano) + extras (PJ 2025, voto anticipado, prision preventiva)
+   - Historial: indicadores por seccion y por celda (seccion x sexo x grupo de edad): promedio, desviacion, brecha_pres, tendencia, P_PJ2025
+   - ECEG: escolaridad por sexo, % posbasica, % internet por seccion
+   
+3. `segmentacion.py` — Dos etapas:
+   - LCA: terciles ponderados por eleccion, EM propio (mezcla de categoricas), seleccion de k por BIC en 4-6, bootstrap de Poisson (ARI 0.98)
+   - Subperfiles: KMeans ponderado dentro de cada clase, seleccion de k por estabilidad (ARI >= 0.8), sobrerrepresentacion por entidad y persona-tipo, municipio dominante
+
+4. `visualizacion.py` — Carga y ensambla celdas con pesos, perfiles, subperfiles y ECEG. Genera:
+   - `vista_general.png`, `ficha_perfil_{0..5}.png`, `fichas_perfiles.pdf`
+   - `mapa_perfil_dominante.png` (estatico)
+   - `mapa_clases_latentes.html` (~12 MB, interactivo con folium y Stadia Maps)
+   - `fichas_resumen_perfiles.csv`, `fichas_municipios.csv`, `fichas_cruce_municipios.csv`
+   - Cruce municipal por nombre normalizado (3 pasos: exacto, contenido, aproximado)
+
+Autoria en todos los scripts: Angel David Durazo Bartolini y Jehu Jonathan Ramirez Ramirez.
+
+### Compatibilidad con los notebooks
+
+Scripts y notebooks usan los mismos nombres de columna, sin acento (`SECCION`, `REGION`, `desviacion`, `indice`, `metodo`, `entropia`), y producen los mismos resultados, por lo que se pueden mezclar: los notebooks 08 a 11 corren sobre los parquets del script. El notebook 01 no descarga la ECEG 2020 ni el shapefile: se obtienen con `descarga_inicial.py`.
+
+Verificado en clon limpio: `.sh` y notebooks 01-04 y 07-11 dan clases, subperfiles e historial identicos a las salidas de referencia. Los notebooks 05 y 06 no se reejecutaron (~19 y ~37 min).
+
+### Script de ejecucion completa
+
+`ejecutar_pipeline.sh` levanta el proyecto de cero: verifica/instala UV, instala Python 3.12 y dependencias con `uv sync`, ejecuta los 4 scripts en orden y al terminar inicia un servidor HTTP local en el puerto 8765 para servir el mapa interactivo. No requiere API key (Stadia Maps funciona desde localhost). Uso: `chmod +x ejecutar_pipeline.sh && ./ejecutar_pipeline.sh`.
+
 ## Estado del Proyecto
 
 - [x] Lectura de convocatoria y rubrica
@@ -524,7 +562,10 @@ Pregunta: cambia la segmentación si el modelo de clases latentes recibe, ademá
 - [x] Fichas y mapa de las clases latentes con escolaridad (notebook 11)
 - [x] Segmentación final: clases latentes (notebook 08, k=6) con subperfiles del 09
 - [x] Nombres definitivos de los perfiles (`NOMBRES` en el 11)
-- [ ] Propuesta de estrategias
-- [ ] Documento técnico
-- [ ] Fichas de perfil
-- [ ] Presentación ejecutiva
+- [x] Propuesta de estrategias (`DATA/DOCS/estrategias_por_perfil.md`)
+- [x] Documento técnico (`DATA/DOCS/documento_tecnico.pdf`, 11 páginas)
+- [x] Fichas de perfil (`DATA/PREPROCESSED/fichas/`)
+- [x] Presentación ejecutiva (`DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
+- [x] Scripts de produccion (`src/descarga_inicial.py`, `preprocesamiento.py`, `segmentacion.py`, `visualizacion.py`)
+- [ ] Cartas firmadas (requieren la firma del equipo)
+- [ ] Envío a grecia.castro@ine.mx y cirse.rodriguez@ine.mx (31 oct 2026, 23:59 hrs)

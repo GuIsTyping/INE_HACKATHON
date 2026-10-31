@@ -62,7 +62,7 @@ hacerlo. Su asignación poco clara sugiere que están entre dos comportamientos.
   resultados tangibles de procesos electorales recientes en su región. Combatir la percepción
   de que "da igual votar" con evidencia local de elecciones definidas por márgenes estrechos.
 - **Canal.** Medios tradicionales y comunitarios: radio local, presencia en eventos
-  comunitarios. El acceso a internet es el más bajo (49%), por lo que la estrategia digital
+  comunitarios. El acceso a internet es de los más bajos (49%), por lo que la estrategia digital
   es complementaria, no central.
 - **Momento.** Intervención continua, también fuera de los periodos electorales. Programas de vinculación
   cívica permanente en las regiones donde se concentra.

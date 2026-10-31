@@ -1,5 +1,34 @@
 # Bitacora de Cambios
 
+## 2026-10-31
+
+### Correcciones previas a la entrega
+- Fichas y mapa: restaurados acentos en nombres de perfil, descriptores, etiquetas y entidades (`src/visualizacion.py` y notebook 11), incluido "Menores de 40 años". Fichas regeneradas
+- Columnas de scripts sin acento (`desviacion`, `indice`, `metodo`, `entropia`) para que coincidan con los notebooks; el notebook 09 ya corre sobre los parquets del script
+- `src/preprocesamiento.py`: el inventario lee las filas de los metadatos del parquet en lugar de cargarlo completo (pico de ~15 GB a 232 MB con todo ya generado)
+- `src/descarga_inicial.py`, `preprocesamiento.py`, `segmentacion.py`: escritura a temporal y renombrado; extraccion comprueba nombre y tamano. Una corrida interrumpida se puede repetir sin borrar archivos
+- Notebooks: recuperada la ortografia de las celdas markdown (perdida al restaurarlos) y quitadas rutas personales de los outputs
+- `documento_tecnico.md`: el indice de sobrerrepresentacion se expresa con 100 = nacional (decia 1,000); P1 pasa de tener "el" menor acceso a internet a "uno de los" menores (P5 49.12, P1 49.25). Mismo ajuste en `estrategias_por_perfil.md`
+- `documento_tecnico.pdf` generado desde el .md actual: 11 paginas, Arial 11, interlineado 1.5
+- README: ejecucion con `ejecutar_pipeline.sh`, 10 ZIPs, requisitos
+
+## 2026-10-30
+
+### Notebooks restaurados (PR #6)
+- Restaurados los notebooks anteriores a la correccion de ortografia de 2026-10-26, que habia puesto acentos en nombres de columna y variables. Deja sin efecto el reemplazo de 102 ocurrencias registrado abajo
+
+### Acentos en nombres de columna (notebooks y Knowledge Base)
+- Reemplazadas 102 ocurrencias de SECCION/REGION (antes con acento) en las 11 libretas para que coincidan con los parquets generados por los scripts
+- Actualizada la Knowledge Base con los mismos nombres sin acento
+
+### Scripts de produccion
+- `src/descarga_inicial.py`: actualizado docstring con autoria y mencion de shapefiles/ECEG
+- `src/preprocesamiento.py` (nuevo, ~290 lineas): consolidacion federal con PyArrow, historial por seccion y celda, ECEG 2020. Codigo de produccion extraido de notebooks 01, 03 y 10
+- `src/segmentacion.py` (nuevo, ~380 lineas): clases latentes (EM propio sobre terciles ponderados, k=6) y subperfiles anidados (KMeans, 27 subperfiles). Codigo extraido de notebooks 08 y 09
+- `src/visualizacion.py` (nuevo, ~580 lineas): fichas PNG/PDF, mapa estatico, mapa interactivo folium, tablas CSV, cruce municipal por nombre. Codigo extraido de notebook 11
+- Todos con logica skip-if-exists, autoria de Angel David Durazo Bartolini y Jehu Jonathan Ramirez Ramirez
+- `ejecutar_pipeline.sh` (nuevo): script ejecutable que levanta el proyecto de cero (verifica UV, instala entorno, ejecuta los 4 scripts en orden) y al terminar inicia un servidor HTTP local en puerto 8765 para el mapa interactivo
+
 ## 2026-10-27
 
 ### Entregables en lenguaje más accesible
