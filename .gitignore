@@ -35,3 +35,6 @@ pruebas_locales/
 
 # DB_Store
 .DS_Store
+
+# Cartas firmadas (se entregan en el zip)
+CARTAS FIRMADAS/

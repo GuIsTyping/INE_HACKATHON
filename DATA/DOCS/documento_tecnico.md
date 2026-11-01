@@ -3,6 +3,7 @@
 **Reto 1: Perfiles ciudadanos de participación**
 Hackea la participación: Datos que construyen democracia | INE, 2026
 
+**Proyecto:** Mosaico Democrático | **Equipo:** Buhos_MCD
 **Autores:** Ángel David Durazo Bartolini y Jehú Jonathan Ramírez Ramírez
 
 ---
@@ -117,7 +118,7 @@ Las siguientes tablas resumen los seis perfiles: primero quiénes son y después
 | # | Nombre | Población | % | % mujeres | Edad predominante |
 |---|---|---|---|---|---|
 | 0 | Por convencer | 15.3M | 21.4 | 25 | 30-39 |
-| 1 | Constancia que se apaga | 5.9M | 8.3 | 44 | 30-39 |
+| 1 | Constancia que se apaga | 5.9M | 8.3 | 43 | 30-39 |
 | 2 | Generación en ascenso | 13.3M | 18.6 | 53 | 30-39 |
 | 3 | Paso firme | 11.6M | 16.3 | 57 | 40-49 |
 | 4 | Voces que avanzan | 8.4M | 11.8 | 68 | 40-49 |
@@ -134,17 +135,17 @@ Las siguientes tablas resumen los seis perfiles: primero quiénes son y después
 
 ### 4.1 Descripción de los perfiles
 
-**P0 - Por convencer (15.3M, 21.4%).** La participación más baja (37.3%). Mayoritariamente masculino (75%) y joven (87% menor de 40 años). Concentrado en el Noroeste (Baja California, Sonora, Chihuahua). Vive en secciones con escolaridad media de 9.3 grados y 51% de viviendas con internet. Vota algo más en presidenciales y su tendencia es apenas positiva. Es el perfil más claramente definido: 92% de sus integrantes pertenece a él sin ambigüedad. Es el grupo más alejado de las urnas en todas las elecciones.
+**P0 - Por convencer (15.3M, 21.4%).** La participación más baja (37.3%). Mayoritariamente masculino (75%) y joven (87% menor de 40 años). Sobrerrepresentado en el Noroeste (Baja California, Chihuahua, Sinaloa). Vive en secciones con escolaridad media de 9.3 grados y 51% de viviendas con internet. Vota algo más en presidenciales y su tendencia es apenas positiva. Es el perfil más claramente definido: 92% de sus integrantes pertenece a él sin ambigüedad. Es el grupo más alejado de las urnas en todas las elecciones.
 
-**P1 - Constancia que se apaga (5.9M, 8.3%).** Participación intermedia (48.5%) y la brecha presidencial más baja (7.6 puntos): vota de manera pareja sin importar el tipo de elección. Pero viene en descenso (-1.6 puntos por elección) y es el único perfil con tendencia negativa. Vive en las secciones con menor escolaridad (9.1 grados) y con uno de los accesos a internet más bajos (49%). Concentrado en Occidente (Jalisco, Guanajuato, Colima). Solo 44% de sus integrantes pertenece claramente a este perfil; el resto se parece también a otro perfil vecino, lo que es coherente con una población en transición.
+**P1 - Constancia que se apaga (5.9M, 8.3%).** Participación intermedia (48.5%) y la brecha presidencial más baja (7.6 puntos): vota de manera pareja sin importar el tipo de elección. Pero viene en descenso (-1.6 puntos por elección) y es el único perfil con una caída clara. Vive en las secciones con menor escolaridad (9.1 grados) y con uno de los accesos a internet más bajos (49%). Concentrado en Occidente (Colima, Jalisco, Guanajuato), con presencia alta también en Sonora y Nuevo León. Solo 44% de sus integrantes pertenece claramente a este perfil; el resto se parece también a otro perfil vecino, lo que es coherente con una población en transición.
 
 **P2 - Generación en ascenso (13.3M, 18.6%).** Participación media (50.5%) con una brecha presidencial marcada (+18.4) y la segunda tendencia ascendente más alta (+3.0): pasó de 36% en 2009 a 58% en 2024. Joven (66% menor de 40), equilibrado en género y predominantemente urbano (76%). En zonas urbanas vive en secciones con escolaridad alta (10.6 grados) y tiene el mayor acceso a internet (55%). Se moviliza en elecciones presidenciales pero se ausenta en las intermedias.
 
-**P3 - Paso firme (11.6M, 16.3%).** Participación de 60.3% y el patrón más estable de todos (brecha 9.3, tendencia -0.1). Adultos de 40-49 años, 57% mujeres, con fuerte presencia en Occidente. Es el perfil del votante consistente: participa sin importar el tipo de elección y su participación no cambia con el tiempo.
+**P3 - Paso firme (11.6M, 16.3%).** Participación de 60.3% y el patrón más estable de todos (brecha 9.3, tendencia -0.1). Adultos de 40-49 años, 57% mujeres, con fuerte presencia en Occidente (Colima, Jalisco) y Nuevo León. Es el perfil del votante consistente: participa sin importar el tipo de elección y su participación casi no cambia con el tiempo.
 
-**P4 - Voces que avanzan (8.4M, 11.8%).** Participación de 62.0%, con la mayor brecha presidencial (+19.5) y la mayor tendencia ascendente (+4.5, unos 22 puntos entre 2009 y 2024). Mayoría femenina (68%), adultas de 40-49 años. Vive en las secciones de mayor escolaridad (10.1 grados, 50% con educación posbásica) y con mayor afiliación al ISSSTE (7.9%). Es el perfil de mayor dinamismo: su participación crece en cada elección.
+**P4 - Voces que avanzan (8.4M, 11.8%).** Participación de 62.0%, con la mayor brecha presidencial (+19.5) y la mayor tendencia ascendente (+4.5, unos 22 puntos entre 2009 y 2024). Mayoría femenina (68%), adultas de 40-49 años. Vive en las secciones de mayor escolaridad (10.1 grados, 50% con educación posbásica) y con mayor afiliación al ISSSTE (7.9%). Es el perfil de mayor dinamismo: pasó de 43.1% en 2009 a 72.5% en 2024, aunque todavía baja en las intermedias (64.1% en 2021).
 
-**P5 - Pilar democrático (16.7M, 23.5%).** La participación más alta (72.8%), estable y con tendencia positiva (+1.8). Mayores de 50 años (85% mayor de 40), mayoría femenina (69%) y el perfil más rural (38% en secciones rurales o mixtas). Su escolaridad es polarizada: en zonas rurales vive en secciones de baja escolaridad y en zonas urbanas en las de mayor escolaridad (11.0 grados). Las secciones con 40% o más de hogares indígenas tienen mayor presencia en este perfil (13.2% de su población, contra 7.1% nacional).
+**P5 - Pilar democrático (16.7M, 23.5%).** La participación más alta (72.8%), estable y con tendencia positiva (+1.8). Población de mayor edad (85% con 40 años o más), mayoría femenina (69%) y el perfil más rural (38% en secciones rurales o mixtas). Su escolaridad es polarizada: en zonas rurales vive en secciones de baja escolaridad y en zonas urbanas en las de mayor escolaridad (11.0 grados). Las secciones con 40% o más de hogares indígenas tienen mayor presencia en este perfil (13.2% de su población, contra 7.1% nacional).
 
 ### 4.2 Estructura de los perfiles
 
@@ -182,14 +183,14 @@ Cada estrategia parte del diagnóstico del perfil: barrera, mensaje, canal, mome
 - **Barrera probable:** la participación electoral no forma parte de su rutina ni de su identidad.
 - **Mensaje:** cómo las decisiones electorales afectan su vida cotidiana (empleo, seguridad, servicios urbanos), sin mensajes moralizantes.
 - **Canal:** digital (redes sociales, video corto) y presencia en espacios urbanos (universidades, centros deportivos).
-- **Momento y territorio:** activación 3-4 meses antes de las intermedias, donde más cae. Noroeste (Baja California, Sonora, Chihuahua, Sinaloa).
+- **Momento y territorio:** activación 3-4 meses antes de las intermedias, donde más cae. Noroeste (Baja California, Chihuahua, Sinaloa).
 
 ### P1 - Constancia que se apaga: reactivación temprana
 
 - **Barrera probable:** desencanto progresivo; participaban y están dejando de hacerlo.
 - **Mensaje:** reconocer su participación pasada y mostrar con datos locales que cada voto cuenta.
 - **Canal:** radio local, perifoneo y organizaciones comunitarias. Su acceso a internet es de los más bajos (49%); lo digital es complementario.
-- **Momento y territorio:** vinculación cívica permanente, no solo en periodo electoral. Occidente (Jalisco, Guanajuato, Colima); el subperfil 1.1, que pierde 3.8 puntos por elección, es el caso más urgente.
+- **Momento y territorio:** vinculación cívica permanente, no solo en periodo electoral. Occidente (Colima, Jalisco, Guanajuato), Sonora y Nuevo León; el subperfil 1.1, que pierde 3.8 puntos por elección, es el caso más urgente.
 
 ### P2 - Generación en ascenso: sostener el impulso
 
@@ -203,7 +204,7 @@ Cada estrategia parte del diagnóstico del perfil: barrera, mensaje, canal, mome
 - **Barrera probable:** ninguna crítica. El riesgo es darlo por sentado.
 - **Mensaje:** reconocimiento por su constancia e invitación a ser multiplicadores en su entorno.
 - **Canal:** mixto (52% con internet) y programas de promotores cívicos voluntarios reclutados de este perfil.
-- **Momento y territorio:** mantenimiento continuo con refuerzo electoral. Occidente (Jalisco, Guanajuato, Michoacán); atención al subperfil 3.5, que va a la baja.
+- **Momento y territorio:** mantenimiento continuo con refuerzo electoral. Occidente (Colima, Jalisco) y Nuevo León; atención al subperfil 3.5, que va a la baja.
 
 ### P4 - Voces que avanzan: canalizar el liderazgo cívico femenino
 
@@ -217,16 +218,16 @@ Cada estrategia parte del diagnóstico del perfil: barrera, mensaje, canal, mome
 - **Barrera probable:** envejecimiento y movilidad; en zonas rurales, la distancia a la casilla.
 - **Mensaje:** reconocimiento institucional e invitación a transmitir el hábito del voto a las generaciones jóvenes.
 - **Canal:** presencial y medios tradicionales (radio comunitaria, televisión, impresos).
-- **Momento y territorio:** permanente, con casillas accesibles y asistencia a personas mayores en cada jornada. Rural y Sur-Sureste; el subperfil 5.5 (76.5% de participación, 62% rural) destaca en Campeche.
+- **Momento y territorio:** permanente, con casillas accesibles y asistencia a personas mayores en cada jornada. Rural y Sur-Sureste; el subperfil 5.5 (76.5% de participación, 62% en secciones rurales o mixtas) destaca en Campeche.
 
 ### Matriz de intervención
 
 | Perfil | Prioridad | Objetivo | Canal | Territorio | Cómo medir el avance |
 |---|---|---|---|---|---|
 | P0 Por convencer | Muy alta | Incorporar | Digital + presencial urbano | Noroeste | Participación en intermedias |
-| P1 Constancia que se apaga | Alta (temprana) | Reactivar | Tradicional, comunidad | Occidente | Que la tendencia deje de caer |
+| P1 Constancia que se apaga | Alta (temprana) | Reactivar | Tradicional, comunidad | Occidente, Sonora, Nuevo León | Que la tendencia deje de caer |
 | P2 Generación en ascenso | Alta | Sostener en intermedias | Digital | Nacional urbano | Brecha presidencial-intermedia menor |
-| P3 Paso firme | Media | Mantener, multiplicar | Mixto | Occidente | Participación arriba de 60% |
+| P3 Paso firme | Media | Mantener, multiplicar | Mixto | Occidente, Nuevo León | Participación arriba de 60% |
 | P4 Voces que avanzan | Media-alta | Liderazgo cívico | Digital + redes de mujeres | Nacional | Observadoras y capacitadoras del perfil |
 | P5 Pilar democrático | Alta (preservar) | Facilitar, transmitir | Presencial, radio | Rural, Sur-Sureste | Participación joven en sus secciones |
 
@@ -247,7 +248,7 @@ El análisis de clases latentes sobre la conducta electoral de 2009 a 2024 ident
 
 Tres hallazgos desafían supuestos convencionales: la baja participación se concentra en zonas urbanas y entre jóvenes, no en zonas marginadas; las secciones indígenas participan por encima del promedio; y el principal reto no es incorporar a quienes nunca votan, sino sostener a quienes solo votan en presidenciales. P0, P2 y P4, que suman 52% de la población, votan entre 14 y 20 puntos menos en las intermedias.
 
-Las estrategias propuestas responden a esta evidencia: canales digitales para los perfiles jóvenes y urbanos con mayor acceso a internet (P0, P2, P4), medios tradicionales y comunitarios para los de menor acceso (P1, P5), y mensajes diferenciados que van desde la relevancia personal (P0) hasta el liderazgo cívico femenino (P4) y la transmisión del hábito democrático entre generaciones (P5). La metodología es reproducible y puede reaplicarse con los datos de cada nueva elección para seguir la evolución de los perfiles.
+Las estrategias propuestas responden a esta evidencia: canales digitales para los perfiles más urbanos (P0, P2, P4), medios tradicionales y comunitarios para los de menor acceso a internet (P1, P5), y mensajes diferenciados que van desde la relevancia personal (P0) hasta el liderazgo cívico femenino (P4) y la transmisión del hábito democrático entre generaciones (P5). La metodología es reproducible y puede reaplicarse con los datos de cada nueva elección para seguir la evolución de los perfiles.
 
 ## Referencias
 

@@ -18,7 +18,7 @@ Salida:  DATA/PREPROCESSED/fichas/
     ficha_perfil_{0..5}.png (200 dpi)
     fichas_perfiles.pdf
     mapa_perfil_dominante.png
-    mapa_clases_latentes.html (~12 MB, requiere servirse desde HTTP)
+    mapa_clases_latentes.html (~13 MB)
     fichas_resumen_perfiles.csv
     fichas_municipios.csv
     fichas_cruce_municipios.csv
@@ -31,6 +31,7 @@ Autores: Angel David Durazo Bartolini y Jehu Jonathan Ramirez Ramirez
 
 import difflib
 import re
+import textwrap
 import unicodedata
 import warnings
 from pathlib import Path
@@ -42,7 +43,7 @@ import pandas as pd
 import pyogrio
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.patches import Patch
+from matplotlib.patches import Circle, Ellipse, Patch, Polygon, Rectangle
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 plt.rcParams.update({"figure.dpi": 100, "figure.facecolor": "white"})
@@ -81,12 +82,135 @@ NOMBRES = {
 COLORES_PERFIL = ["#c0392b", "#e67e22", "#d4a017", "#5dade2", "#2e86c1", "#1e8449"]
 COLOR_SIN_DATOS = "#d9d9d9"
 
+# Resumen narrativo de cada ficha. Las cifras se llenan con los datos del perfil;
+# las entidades son las de mayor indice de sobrerrepresentacion
+NARRATIVAS = {
+    0: {
+        "icono": "pregunta", "canal": "celular",
+        "quienes": "Sobre todo hombres ({hombres:.0f}%) y gente joven: {MENOR_40:.0f}% tiene menos de 40 "
+                   "años. Destaca en Baja California, Chihuahua y Sinaloa. Vive en secciones con "
+                   "{escolaridad:.1f} grados de escolaridad y {pct_internet:.0f}% de viviendas con internet.",
+        "votan": "Es el perfil que menos vota en todas las elecciones: {promedio:.1f}% en promedio. "
+                 "Sube cuando se elige presidente y vuelve a caer en las intermedias: "
+                 "{t2018:.1f}% en 2018 y {t2021:.1f}% en 2021.",
+        "barrera": "Votar no forma parte de su rutina ni de su identidad.",
+        "mensaje": "Cómo la elección afecta su vida diaria: empleo, seguridad y servicios.",
+        "medio": "Redes sociales, video corto y espacios urbanos.",
+        "territorio": "Baja California, Chihuahua y Sinaloa, 3-4 meses antes de intermedias.",
+    },
+    1: {
+        "icono": "vela", "canal": "radio",
+        "quienes": "Población mixta ({MUJER:.0f}% mujeres), con más personas de {edad_dominante} años. "
+                   "Vive en las secciones con menor escolaridad ({escolaridad:.1f} grados) y "
+                   "{pct_internet:.0f}% de viviendas con internet. Destaca en el Occidente "
+                   "(Colima, Jalisco, Guanajuato), Sonora y Nuevo León.",
+        "votan": "Vota parejo sin importar el tipo de elección, pero cada vez menos: en presidenciales "
+                 "bajó de {t2012:.1f}% (2012) a {t2024:.1f}% (2024) y en intermedias de {t2009:.1f}% (2009) "
+                 "a {t2021:.1f}% (2021). Solo {CLARA:.0f}% pertenece claramente al perfil: "
+                 "población en transición.",
+        "barrera": "Desencanto progresivo: votaban y están dejando de hacerlo.",
+        "mensaje": "Reconocer su participación pasada y mostrar con datos locales que cada voto cuenta.",
+        "medio": "Radio local, perifoneo y organizaciones comunitarias.",
+        "territorio": "Occidente, Sonora y Nuevo León, con vinculación permanente.",
+    },
+    2: {
+        "icono": "ascenso", "canal": "celular",
+        "quienes": "Población joven ({MENOR_40:.0f}% menor de 40 años), equilibrada entre mujeres y "
+                   "hombres ({MUJER:.0f}% mujeres) y urbana ({urbano:.0f}%). Vive en las secciones con "
+                   "mayor acceso a internet ({pct_internet:.0f}%). Destaca en Tlaxcala, "
+                   "Ciudad de México y Puebla.",
+        "votan": "Pasó de {t2009:.1f}% en 2009 a {t2024:.1f}% en 2024, pero depende de la elección "
+                 "presidencial: vota {brecha_pres:.1f} puntos más que en intermedias. "
+                 "De {t2018:.1f}% en 2018 bajó a {t2021:.1f}% en 2021.",
+        "barrera": "Participación selectiva: no percibe las intermedias como relevantes.",
+        "mensaje": "Las intermedias definen servicios locales: transporte, educación y salud.",
+        "medio": "Redes sociales, video y contenido interactivo.",
+        "territorio": "Urbano nacional, con foco en Tlaxcala y el centro, 6 meses antes de intermedias.",
+    },
+    3: {
+        "icono": "huellas", "canal": "radio",
+        "quienes": "Personas adultas, con más presencia de {edad_dominante} años y {MUJER:.0f}% mujeres. "
+                   "Vive en secciones con {escolaridad:.1f} grados de escolaridad y {pct_internet:.0f}% "
+                   "de viviendas con internet. Destaca en Colima, Jalisco y Nuevo León.",
+        "votan": "Es el voto constante: {promedio:.1f}% en promedio y sin cambio con el tiempo "
+                 "({tendencia:+.1f} puntos por elección). Vota más en presidenciales, pero con una de las "
+                 "brechas más bajas (+{brecha_pres:.1f} puntos).",
+        "barrera": "Ninguna crítica; el riesgo es darlo por sentado.",
+        "mensaje": "Reconocer su constancia e invitar a multiplicarla en su entorno.",
+        "medio": "Medios mixtos y promotores cívicos voluntarios.",
+        "territorio": "Colima y Jalisco, con mantenimiento continuo.",
+    },
+    4: {
+        "icono": "megafono", "canal": "celular",
+        "quienes": "Mayoría de mujeres ({MUJER:.0f}%), con más presencia de {edad_dominante} años. "
+                   "Vive en las secciones de mayor escolaridad promedio ({escolaridad:.1f} grados, "
+                   "{pct_posbasica:.0f}% con educación posbásica). Destaca en Tlaxcala, Puebla y "
+                   "Ciudad de México.",
+        "votan": "Es el perfil que más ha crecido: de {t2009:.1f}% en 2009 a {t2024:.1f}% en 2024. "
+                 "También es el que más depende de la presidencial (+{brecha_pres:.1f} puntos): "
+                 "de {t2018:.1f}% en 2018 bajó a {t2021:.1f}% en 2021.",
+        "barrera": "La misma caída en intermedias que P2; la oportunidad es el liderazgo cívico.",
+        "mensaje": "Invitar a ser observadoras, capacitadoras y promotoras del voto.",
+        "medio": "Digital y redes de mujeres organizadas.",
+        "territorio": "Piloto en Tlaxcala, en el impulso posterior a cada presidencial.",
+    },
+    5: {
+        "icono": "columna", "canal": "radio",
+        "quienes": "Población de mayor edad: {mayor_40:.0f}% tiene 40 años o más y el grupo más numeroso es "
+                   "de {edad_dominante} años. Mayoría de mujeres ({MUJER:.0f}%) y el perfil más rural "
+                   "({RURAL_MIXTA:.0f}% en secciones rurales o mixtas). Destaca en Yucatán, Campeche y "
+                   "Estado de México.",
+        "votan": "Es el perfil que más vota: {promedio:.1f}% en promedio, por encima del nacional en todas "
+                 "las elecciones. Incluso en las intermedias supera 60%: {t2009:.1f}% en 2009 y "
+                 "{t2021:.1f}% en 2021.",
+        "barrera": "Envejecimiento y movilidad; en zonas rurales, la distancia a la casilla.",
+        "mensaje": "Reconocimiento institucional e invitación a transmitir el hábito del voto.",
+        "medio": "Presencial, radio comunitaria, televisión e impresos.",
+        "territorio": "Zonas rurales, Yucatán y Campeche, con casillas accesibles en cada jornada.",
+    },
+}
+
+# Iconos dibujados con formas simples en blanco sobre un circulo del color del perfil.
+# c: circulo, r: rectangulo, e: elipse, p: poligono. "hueco" usa el color del fondo
+ICONOS = {
+    "personas": [("c", .5, .63, .1), ("e", .5, .38, .3, .3), ("c", .27, .56, .07), ("e", .27, .4, .19, .22),
+                 ("c", .73, .56, .07), ("e", .73, .4, .19, .22)],
+    "urna": [("r", .39, .5, .22, .28), ("r", .24, .23, .52, .3), ("hueco", "r", .32, .47, .36, .04)],
+    "brecha": [("r", .27, .25, .18, .18), ("r", .55, .25, .18, .5)],
+    "sube": [("p", [(.5, .8), (.74, .52), (.59, .52), (.59, .22), (.41, .22), (.41, .52), (.26, .52)])],
+    "baja": [("p", [(.5, .2), (.74, .48), (.59, .48), (.59, .78), (.41, .78), (.41, .48), (.26, .48)])],
+    "estable": [("p", [(.8, .5), (.52, .74), (.52, .59), (.22, .59), (.22, .41), (.52, .41), (.52, .26)])],
+    "barrera": [("p", [(.5, .8), (.8, .26), (.2, .26)]), ("hueco", "r", .47, .44, .06, .2),
+                ("hueco", "c", .5, .35, .035)],
+    "mensaje": [("e", .5, .56, .6, .42), ("p", [(.3, .45), (.26, .22), (.47, .36)]),
+                ("hueco", "c", .36, .56, .03), ("hueco", "c", .5, .56, .03), ("hueco", "c", .64, .56, .03)],
+    "celular": [("r", .35, .17, .3, .66), ("hueco", "r", .39, .28, .22, .46), ("hueco", "c", .5, .225, .025)],
+    "radio": [("r", .2, .24, .6, .36), ("p", [(.3, .6), (.35, .6), (.66, .8), (.63, .83)]),
+              ("hueco", "c", .36, .42, .11), ("hueco", "r", .55, .46, .17, .035),
+              ("hueco", "r", .55, .36, .17, .035)],
+    "territorio": [("c", .5, .59, .2), ("p", [(.32, .51), (.68, .51), (.5, .17)]), ("hueco", "c", .5, .59, .08)],
+    "pregunta": [("e", .5, .56, .62, .5), ("p", [(.28, .42), (.24, .18), (.46, .33)])],
+    "vela": [("r", .39, .2, .22, .34), ("r", .29, .15, .42, .06), ("r", .49, .54, .02, .07),
+             ("p", [(.5, .87), (.59, .72), (.56, .62), (.44, .62), (.41, .72)])],
+    "ascenso": [("r", .23, .25, .14, .14), ("r", .43, .25, .14, .28), ("r", .63, .25, .14, .48)],
+    "huellas": [("e", .36, .34, .16, .26), ("c", .29, .51, .025), ("c", .35, .53, .025), ("c", .41, .52, .025),
+                ("e", .64, .56, .16, .26), ("c", .57, .73, .025), ("c", .63, .75, .025), ("c", .69, .74, .025)],
+    "megafono": [("p", [(.22, .42), (.22, .58), (.6, .76), (.6, .24)]), ("r", .29, .24, .1, .2),
+                 ("r", .66, .47, .14, .06), ("p", [(.65, .62), (.78, .7), (.75, .75), (.63, .67)]),
+                 ("p", [(.65, .38), (.78, .3), (.75, .25), (.63, .33)])],
+    "columna": [("r", .27, .71, .46, .08), ("r", .36, .3, .28, .39), ("r", .27, .2, .46, .08),
+                ("hueco", "r", .43, .3, .025, .39), ("hueco", "r", .545, .3, .025, .39)],
+}
+
 UMBRAL_CLARA = 0.8
 MIN_PERSONAS_ENTIDAD = 20_000
 MIN_PERSONAS_MPIO = 1_000
 TOL_MUNICIPIO = 0.01
 TOL_ESTADO = 0.02
 DPI_FICHA = 200
+FICHA_ANCHO = 16
+FICHA_ALTO = 24.3
+PIE_FICHA = "Mosaico Democrático  |  Equipo Buhos_MCD  |  Hackea la participación, INE 2026"
 
 # Umbrales para los descriptores automaticos
 UMBRAL_INDICE = 1.4
@@ -296,7 +420,7 @@ def generar_descriptores(celdas, res_perfil, K):
     def rasgos_demograficos(p):
         rasgos = []
         if idx_edad.loc[p].max() >= UMBRAL_INDICE:
-            rasgos.append(idx_edad.loc[p].idxmax())
+            rasgos.append(f"destacan {idx_edad.loc[p].idxmax()}")
         if pct_sexo.loc[p].max() >= UMBRAL_SEXO:
             rasgos.append(f"mayoría {pct_sexo.loc[p].idxmax()}")
         if "R" in idx_tipo.columns and idx_tipo.loc[p, "R"] >= UMBRAL_INDICE:
@@ -500,6 +624,92 @@ def tabla_subperfiles(ax, p, res_sub, ent_sub, color):
     ax.set_title("Subperfiles", fontsize=11)
 
 
+def dibujar_icono(ax, nombre, color):
+    """Dibuja un icono de ICONOS en blanco sobre un circulo del color indicado."""
+    ax.set_xlim(-0.01, 1.01)
+    ax.set_ylim(-0.01, 1.01)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.add_patch(Circle((0.5, 0.5), 0.5, color=color))
+    for forma in ICONOS[nombre]:
+        relleno = "white"
+        if forma[0] == "hueco":
+            relleno, forma = color, forma[1:]
+        tipo, *args = forma
+        if tipo == "c":
+            ax.add_patch(Circle((args[0], args[1]), args[2], color=relleno))
+        elif tipo == "r":
+            ax.add_patch(Rectangle((args[0], args[1]), args[2], args[3], color=relleno))
+        elif tipo == "e":
+            ax.add_patch(Ellipse((args[0], args[1]), args[2], args[3], color=relleno))
+        else:
+            ax.add_patch(Polygon(args[0], color=relleno))
+    if nombre == "pregunta":
+        ax.text(0.5, 0.56, "?", ha="center", va="center", fontsize=52, fontweight="bold", color=color)
+
+
+def banda_narrativa(fig, p, r, tray, color):
+    """Resumen narrativo e iconografico en la parte superior de la ficha."""
+    n = NARRATIVAS[p]
+    datos = {
+        **r.to_dict(), **{f"t{a}": v for a, v in zip(ANOS, tray)},
+        "hombres": 100 - r["MUJER"], "urbano": 100 - r["RURAL_MIXTA"], "mayor_40": 100 - r["MENOR_40"],
+    }
+
+    def ejes(x, y, ancho, alto):
+        """Ejes ubicados en pulgadas, con y medida desde el borde superior."""
+        return fig.add_axes([x / FICHA_ANCHO, 1 - (y + alto) / FICHA_ALTO,
+                             ancho / FICHA_ANCHO, alto / FICHA_ALTO])
+
+    # Icono del perfil y narrativa
+    dibujar_icono(ejes(1.5, 1.72, 1.65, 1.65), n["icono"], color)
+    for x, titulo, texto in [(3.55, "Quiénes son", n["quienes"]), (9.65, "Cómo votan", n["votan"])]:
+        ax = ejes(x, 1.6, 5.85, 1.95)
+        ax.axis("off")
+        ax.text(0, 0.98, titulo, fontsize=14, fontweight="bold", color=color, va="top")
+        ax.text(0, 0.8, textwrap.fill(texto.format(**datos), 63), fontsize=12, color="#333",
+                va="top", linespacing=1.4)
+
+    # Cifras clave y estrategia
+    ancho = 3.4
+    separacion = 0.16
+    icono_tendencia = "sube" if r["tendencia"] >= 0.5 else "baja" if r["tendencia"] <= -0.5 else "estable"
+    cifras = [
+        ("personas", f"{r['personas'] / 1e6:.1f} M", f"personas ({r['pct_pob']:.1f}% de la lista)"),
+        ("urna", f"{r['promedio']:.1f}%", "participación promedio"),
+        ("brecha", f"{r['brecha_pres']:+.1f} pts", "extra en presidenciales"),
+        (icono_tendencia, f"{r['tendencia']:+.1f} pts", "de cambio por elección"),
+    ]
+    estrategia = [
+        ("barrera", "BARRERA PROBABLE (HIPÓTESIS)", n["barrera"]),
+        ("mensaje", "MENSAJE", n["mensaje"]),
+        (n["canal"], "CANAL", n["medio"]),
+        ("territorio", "TERRITORIO Y MOMENTO", n["territorio"]),
+    ]
+    for i in range(4):
+        x = 1.44 + i * (ancho + separacion)
+
+        fondo = ejes(x, 3.68, ancho, 0.95)
+        fondo.axis("off")
+        fondo.add_patch(Rectangle((0, 0), 1, 1, color=color, alpha=0.08, transform=fondo.transAxes))
+        icono, valor, etiqueta = cifras[i]
+        dibujar_icono(ejes(x + 0.12, 3.8, 0.71, 0.71), icono, color)
+        fondo.text(0.28, 0.66, valor, fontsize=17, fontweight="bold", color="#222",
+                   va="center", transform=fondo.transAxes)
+        fondo.text(0.28, 0.26, etiqueta, fontsize=9.5, color="#555", va="center", transform=fondo.transAxes)
+
+        fondo = ejes(x, 4.75, ancho, 1.25)
+        fondo.axis("off")
+        fondo.add_patch(Rectangle((0, 0), 1, 1, fill=False, edgecolor=color, linewidth=1.2,
+                                  transform=fondo.transAxes))
+        icono, titulo, texto = estrategia[i]
+        dibujar_icono(ejes(x + 0.12, 4.87, 0.55, 0.55), icono, color)
+        fondo.text(0.22, 0.86, titulo, fontsize=8.5, fontweight="bold", color=color,
+                   va="center", transform=fondo.transAxes)
+        fondo.text(0.22, 0.7, textwrap.fill(texto, 32), fontsize=10.5, color="#333", va="top",
+                   linespacing=1.3, transform=fondo.transAxes)
+
+
 def generar_fichas(celdas, res_perfil, res_sub, tray_perfil, nac_tray,
                    nac_edad, nac_reg, nac_esc_tramo, nac_esc, nac_internet,
                    ent_perfil, ent_sub, gmun, gdf_edo, descriptores, K):
@@ -511,21 +721,24 @@ def generar_fichas(celdas, res_perfil, res_sub, tray_perfil, nac_tray,
             dp = celdas[celdas["perfil"] == p]
             n_sub = res_sub.loc[p].shape[0]
 
-            fig = plt.figure(figsize=(16, 20), facecolor="white")
+            fig = plt.figure(figsize=(FICHA_ANCHO, FICHA_ALTO), facecolor="white")
             gs = fig.add_gridspec(4, 3, height_ratios=[1, 1, 1.1, 0.7], hspace=0.32, wspace=0.32,
-                                  top=0.92, bottom=0.02, left=0.09, right=0.97)
-            fig.suptitle(f"Perfil {p}: {NOMBRES[p]}", fontsize=18, fontweight="bold",
-                         color=color, y=0.985)
-            fig.text(0.5, 0.958, descriptores[p], ha="center", fontsize=12, style="italic", color="#333")
-            fig.text(0.5, 0.94,
+                                  top=1 - 6.4 / FICHA_ALTO, bottom=0.4 / FICHA_ALTO, left=0.09, right=0.97)
+            fig.suptitle(f"Perfil {p}: {NOMBRES[p]}", fontsize=22, fontweight="bold",
+                         color=color, y=1 - 0.3 / FICHA_ALTO)
+            fig.text(0.5, 1 - 0.84 / FICHA_ALTO, descriptores[p], ha="center", fontsize=12, style="italic",
+                     color="#333")
+            fig.text(0.5, 1 - 1.2 / FICHA_ALTO,
                      f"{r['personas']:,.0f} personas ({r['pct_pob']:.1f}% de la lista nominal analizada)"
-                     f"   |   edad dominante {r['edad_dominante']}   |   {r['MUJER']:.0f}% mujeres"
+                     f"   |   grupo de edad más numeroso: {r['edad_dominante']}   |   {r['MUJER']:.0f}% mujeres"
                      f"   |   {r['escolaridad']:.1f} grados de escolaridad",
                      ha="center", fontsize=11, color="#555")
 
+            tray = tray_perfil.loc[p].to_numpy()
+            banda_narrativa(fig, p, r, tray, color)
+
             # Trayectoria
             ax = fig.add_subplot(gs[0, :2])
-            tray = tray_perfil.loc[p].to_numpy()
             ax.plot(ANOS, nac_tray, "s--", color="#aaa", linewidth=1.5, label="Nacional")
             ax.plot(ANOS, tray, "o-", color=color, linewidth=2.8, markersize=8, label=f"Perfil {p}")
             ax.fill_between(ANOS, tray, nac_tray, color=color, alpha=0.08)
@@ -589,6 +802,7 @@ def generar_fichas(celdas, res_perfil, res_sub, tray_perfil, nac_tray,
 
             # Tabla de subperfiles
             tabla_subperfiles(fig.add_subplot(gs[3, :]), p, res_sub, ent_sub, color)
+            fig.text(0.5, 0.15 / FICHA_ALTO, PIE_FICHA, ha="center", fontsize=10, color="#777")
 
             fig.savefig(DIR_FICHAS / f"ficha_perfil_{p}.png", dpi=DPI_FICHA)
             pdf.savefig(fig)
@@ -841,14 +1055,13 @@ def generar_mapa_interactivo(gmun, gedo, celdas, res_perfil, tray_perfil, nac_tr
         dist_esc[p] = (con.groupby("tramo_esc")["peso"].sum()
                        .reindex(TRAMOS_ESC, fill_value=0) / wc * 100).tolist()
 
-    # Mapa base con tiles Stadia Maps (funcionan desde localhost sin API key)
+    # Mapa base con tiles CARTO (sin API key; funcionan al abrir el archivo sin servidor)
     m = folium.Map(location=[23.6, -102.5], zoom_start=5, tiles=None)
     folium.TileLayer(
-        tiles="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         attr=(
-            "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a> "
-            "&copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> "
-            "&copy; <a href='https://www.openstreetmap.org/copyright'>OSM</a>"
+            "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> "
+            "&copy; <a href='https://carto.com/attributions'>CARTO</a>"
         ),
         name="Mapa base",
     ).add_to(m)

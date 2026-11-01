@@ -2,6 +2,18 @@
 
 ## 2026-10-31
 
+### Correcciones contra los datos antes de la entrega
+- `documento_tecnico.md` y `estrategias_por_perfil.md`, comparados con los indices de sobrerrepresentacion y las trayectorias: P0 sin Sonora (indice 124, lugar 13); P1 suma Sonora (397) y Nuevo Leon (313); P3 sin Michoacan (76, subrepresentado) y con Colima, Jalisco y Nuevo Leon; P4 ya no dice que crece en cada eleccion (baja en intermedias); P1 "unico perfil con una caida clara" (P3 tiene -0.1) y 43% mujeres (dato 43.49, decia 44); conclusion: P0, P2 y P4 como los perfiles mas urbanos
+- "62% rural" y "57% rural" de los subperfiles 5.5 y 3.5 pasan a "rurales o mixtas", que es lo que mide la columna
+- `documento_tecnico.pdf` regenerado desde el .md. Proyecto (Mosaico Democratico) y equipo (Buhos_MCD), los de las cartas firmadas, en documento, estrategias, README y pie de las fichas
+- `src/visualizacion.py`: mapa base CARTO, igual que el notebook 11. Stadia responde 401 sin servidor local; README actualizado
+- `presentacion_ejecutiva.pptx`: proyecto y equipo en la portada; P1 con 57% hombres (dato 56.51) y "unico perfil con una caida clara"; territorios de P1 y P3 como en el documento; fichas con resumen narrativo e iconografico; mapa "con internet"; sin el "(I)" que quedaba en el titulo de estrategias
+
+### Fichas con resumen narrativo e iconografico
+- `src/visualizacion.py` y notebook 11: nueva banda superior en cada ficha, como pide la Base Sexta: icono del perfil, "Quienes son", "Como votan", cuatro cifras clave con icono y estrategia (barrera probable, mensaje, canal, territorio y momento). Iconos dibujados con formas de matplotlib, sin dependencias nuevas. Ficha de 16 x 24.3 pulgadas (antes 16 x 20)
+- Las cifras de la narrativa se llenan con los datos del perfil. Las entidades citadas son las de mayor indice de sobrerrepresentacion: P0 Baja California, Chihuahua y Sinaloa; P1 Occidente, Sonora y Nuevo Leon; P3 Colima, Jalisco y Nuevo Leon
+- Descriptores: "destacan jovenes (18-24)" en lugar de "jovenes (18-24)", y encabezado con "grupo de edad mas numeroso" en lugar de "edad dominante", para no contradecirse en P0, P2 y P5. Tambien cambia en el panel del mapa y en `fichas_resumen_perfiles.csv`; mismas cifras
+
 ### Detalles finales de formato
 - `documento_tecnico.pdf` regenerado: tablas en Arial 11 con interlineado 1.5 (antes 8-9 pt) y margenes de 2.2 cm (antes 2.5) para no pasar de 12 paginas
 - `documento_tecnico.md`: la tabla resumen de la seccion 4 se divide en dos (quienes son y como votan) porque 10 columnas no caben a 11 pt; mismas cifras

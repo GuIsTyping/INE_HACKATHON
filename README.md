@@ -2,6 +2,8 @@
 
 Reto 1: Segmentación sociodemográfica de la participación ciudadana a partir de los Conteos Censales del INE (2009-2025).
 
+**Proyecto:** Mosaico Democrático | **Equipo:** Buhos_MCD
+
 **Autores:** Ángel David Durazo Bartolini y Jehú Jonathan Ramírez Ramírez
 
 ## Requisitos
@@ -75,16 +77,7 @@ Ejecuta las celdas en orden. Además de descargar y extraer, consolida los CSVs 
 
 ## Mapa interactivo
 
-`ejecutar_pipeline.sh` y el notebook 11 generan un mapa interactivo en `DATA/PREPROCESSED/fichas/mapa_clases_latentes.html`. Los tiles del mapa (Stadia Maps) requieren servirse desde un servidor HTTP, no se pueden abrir directamente como archivo local.
-
-Para visualizar el mapa:
-
-```bash
-cd DATA/PREPROCESSED/fichas
-python -m http.server 8765
-```
-
-Luego abrir en el navegador: `http://localhost:8765/mapa_clases_latentes.html`
+`ejecutar_pipeline.sh` y el notebook 11 generan un mapa interactivo en `DATA/PREPROCESSED/fichas/mapa_clases_latentes.html`. Se abre directamente en el navegador; necesita internet para cargar el mapa base (CARTO) y las bibliotecas.
 
 El mapa incluye capas municipal y estatal con el perfil dominante por territorio, popups con detalles y un panel lateral con los 6 perfiles.
 
@@ -127,10 +120,10 @@ INE_HACKATHON/
 
 | Documento | Archivo |
 |---|---|
-| Documento técnico | `DATA/DOCS/documento_tecnico.md` (el PDF de 11 páginas se entrega aparte, no se versiona) |
+| Documento técnico | `DATA/DOCS/documento_tecnico.md` (el PDF de 12 páginas se entrega aparte, no se versiona) |
 | Estrategias diferenciadas por perfil | `DATA/DOCS/estrategias_por_perfil.md` |
 | Presentación ejecutiva (10 diapositivas) | `DATA/DOCS/presentacion_ejecutiva.pptx` |
-| Fichas de perfil (PNG 200 dpi + PDF) | `DATA/PREPROCESSED/fichas/` |
+| Fichas de perfil con resumen narrativo e iconográfico (PNG 200 dpi + PDF) | `DATA/PREPROCESSED/fichas/` |
 | Mapa interactivo | `DATA/PREPROCESSED/fichas/mapa_clases_latentes.html` |
 
 ## Documentación

@@ -1,5 +1,7 @@
 # Estrategias diferenciadas de fomento a la participación
 
+**Proyecto:** Mosaico Democrático | **Equipo:** Buhos_MCD
+
 **Autores:** Ángel David Durazo Bartolini y Jehú Jonathan Ramírez Ramírez
 
 Propuesta de intervención por perfil, basada en las características identificadas por la
@@ -16,7 +18,7 @@ mensajes son institucionales y no partidistas.
 
 **Diagnóstico.** Participación promedio de 37.3%, la más baja. Perfil mayoritariamente masculino
 (75%), joven (87% menor de 40, edad dominante 30-39), con presencia fuerte en el Noroeste
-(Baja California, Sonora, Chihuahua). Escolaridad media de 9.3 grados (secundaria terminada),
+(Baja California, Chihuahua, Sinaloa). Escolaridad media de 9.3 grados (secundaria terminada),
 51% de viviendas con internet. Responde algo más a elecciones presidenciales (brecha +14.3)
 y muestra una tendencia ligeramente ascendente (+1.1).
 
@@ -37,7 +39,7 @@ y muestra una tendencia ligeramente ascendente (+1.1).
 - **Momento.** Priorizar las elecciones intermedias, donde su caída es más pronunciada.
   Comenzar campañas de activación 3-4 meses antes de la jornada.
 - **Territorio.** Noroeste (índice de sobrerrepresentación más alto). Entidades prioritarias:
-  Baja California, Sonora, Chihuahua, Sinaloa.
+  Baja California, Chihuahua, Sinaloa.
 - **Indicador de éxito.** Aumento de participación en intermedias en secciones con alta
   concentración de P0 en el Noroeste.
 
@@ -47,9 +49,9 @@ y muestra una tendencia ligeramente ascendente (+1.1).
 
 **Diagnóstico.** Participación de 48.5%, estable entre tipos de elección (brecha 7.6, la más baja)
 pero en descenso sostenido (-1.6 por elección). Es el único perfil con tendencia negativa clara.
-Composición mixta en género (44% mujeres), edad dominante 30-39, fuerte en el Occidente
+Composición mixta en género (43% mujeres), edad dominante 30-39, fuerte en el Occidente
 (Jalisco, Guanajuato, Colima). Vive en las secciones con menor escolaridad promedio (9.1 grados),
-menor % con educación posbásica (38%) y menor acceso a internet (49%). Solo 44% de sus
+menor % con educación posbásica (38%) y uno de los accesos a internet más bajos (49%). Solo 44% de sus
 integrantes pertenece claramente al perfil; el resto se parece también a un perfil vecino. Es una
 población en transición que podría derivar hacia P0 o recuperarse.
 
@@ -66,8 +68,8 @@ hacerlo. Su asignación poco clara sugiere que están entre dos comportamientos.
   es complementaria, no central.
 - **Momento.** Intervención continua, también fuera de los periodos electorales. Programas de vinculación
   cívica permanente en las regiones donde se concentra.
-- **Territorio.** Occidente: Jalisco, Guanajuato, Colima (índices de sobrerrepresentación más
-  altos). Subperfil 1.1 (en caída de -3.8 por elección) en Sonora y Colima como caso crítico.
+- **Territorio.** Occidente (Colima, Jalisco, Guanajuato), Sonora y Nuevo León, que tienen los
+  índices de sobrerrepresentación más altos. Subperfil 1.1 (en caída de -3.8 por elección) en Sonora y Colima como caso crítico.
 - **Indicador de éxito.** Detención o reversión de la tendencia negativa en secciones con alta
   concentración de P1 en el Occidente.
 
@@ -106,12 +108,12 @@ presidencial pero no percibe las intermedias como relevantes.
 
 **Diagnóstico.** Participación de 60.3%, estable entre tipos de elección (brecha 9.3) y sin
 tendencia (+/-0.1). Perfil adulto (dominante 40-49, 66% mayor de 40), mayoría mujeres (57%),
-fuerte en Occidente (Jalisco, Guanajuato). Escolaridad 9.6 grados, 52% internet. Es el perfil
+fuerte en Occidente (Colima, Jalisco) y Nuevo León. Escolaridad 9.6 grados, 52% internet. Es el perfil
 más predecible: participa de forma consistente sin importar el tipo de elección.
 
 **Barrera probable.** Ninguna barrera crítica. El riesgo es la complacencia institucional: dar
 por sentado a este grupo y no invertir en mantener su compromiso. El subperfil 3.5 (brecha
-0.7, tendencia -3.1, 57% rural, concentrado en Colima) muestra que partes del grupo están
+0.7, tendencia -3.1, 57% en secciones rurales o mixtas, concentrado en Colima) muestra que partes del grupo están
 empezando a declinar.
 
 **Estrategia: reconocer, mantener y multiplicar.**
@@ -123,7 +125,7 @@ empezando a declinar.
   de promotores cívicos voluntarios reclutados de este perfil.
 - **Momento.** Mantenimiento continuo con refuerzo en cada período electoral. Atención
   especial al subperfil 3.5 en declive.
-- **Territorio.** Occidente (Jalisco, Guanajuato, Michoacán). Monitorear municipios donde P3
+- **Territorio.** Occidente (Colima, Jalisco) y Nuevo León. Monitorear municipios donde P3
   es dominante y la participación está cayendo.
 - **Indicador de éxito.** Mantenimiento de la tasa en 60%+ y crecimiento de participación
   del subperfil 3.5.
@@ -136,7 +138,7 @@ empezando a declinar.
 ascendente más pronunciada de todos los perfiles (+4.5 por elección). Perfil de mayoría
 femenina (68%), adulto (dominante 40-49). Vive en las secciones de mayor escolaridad (10.1 grados,
 50% posbásica) y mayor afiliación al ISSSTE (7.9%, el doble del P1). Se moviliza masivamente
-en presidenciales y crece de elección en elección.
+en presidenciales: pasó de 43.1% en 2009 a 72.5% en 2024, aunque todavía baja en intermedias.
 
 **Barrera probable.** Similar a P2: brecha entre presidenciales e intermedias. Pero este grupo
 ya tiene alta participación base, así que la oportunidad es convertir su energía en liderazgo
@@ -162,7 +164,7 @@ cívico más que en simple asistencia a las urnas.
 ## P5: Pilar democrático (16.7M personas, 23.5%)
 
 **Diagnóstico.** La participación más alta (72.8%), estable (brecha 10.6) y con tendencia positiva
-(+1.8). Perfil de mayores (dominante 50-59, 85% mayor de 40), mayoría femenina (69%), el más
+(+1.8). Población de mayor edad (dominante 50-59, 85% con 40 años o más), mayoría femenina (69%), el más
 rural de todos (38% en secciones rurales o mixtas). Escolaridad polarizada: 25% en secciones
 con menos de 8 grados pero 19% en secciones de 12+; en urbanas es el perfil con mayor
 escolaridad (11.0). Menor acceso a internet (49%). Las secciones con presencia indígena
@@ -183,7 +185,7 @@ generacional. En zonas rurales, las distancias a casillas pueden ser una barrera
   (49% internet y edad avanzada).
 - **Momento.** Permanente. Asegurar que las condiciones logísticas de cada jornada electoral
   faciliten su participación (casillas accesibles, asistencia para personas mayores).
-- **Territorio.** Distribución rural amplia. Subperfil 5.5 (76.5% de participación, 62% rural)
+- **Territorio.** Distribución rural amplia. Subperfil 5.5 (76.5% de participación, 62% en secciones rurales o mixtas)
   dominante en 311 municipios, concentrado en Campeche y el Sur-Sureste. Secciones
   indígenas como activo a preservar.
 - **Indicador de éxito.** Mantenimiento de la tasa en 70%+ y aumento de participación de
@@ -197,9 +199,9 @@ generacional. En zonas rurales, las distancias a casillas pueden ser una barrera
 | Perfil | Prioridad INE | Objetivo | Canal principal | Territorio |
 |---|---|---|---|---|
 | P0 Por convencer | Muy alta | Incorporar | Digital + presencial urbano | Noroeste |
-| P1 Constancia que se apaga | Alta (temprana) | Reactivar | Medios tradicionales, comunidad | Occidente |
+| P1 Constancia que se apaga | Alta (temprana) | Reactivar | Medios tradicionales, comunidad | Occidente, Sonora, Nuevo León |
 | P2 Generación en ascenso | Alta | Sostener en intermedias | Digital | Nacional urbano |
-| P3 Paso firme | Media | Mantener y multiplicar | Mixto | Occidente |
+| P3 Paso firme | Media | Mantener y multiplicar | Mixto | Occidente, Nuevo León |
 | P4 Voces que avanzan | Media-alta | Canalizar liderazgo | Digital + redes de mujeres | Nacional |
 | P5 Pilar democrático | Alta (preservar) | Facilitar y transmitir | Presencial, radio | Rural, Sur-Sureste |
 

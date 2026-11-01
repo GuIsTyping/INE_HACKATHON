@@ -34,7 +34,7 @@ Participar en el **Reto 1: Perfiles ciudadanos de participación** (Eje: Segment
 4. ~~Proponer estrategias diferenciadas~~ (completado: `DATA/DOCS/estrategias_por_perfil.md`)
 5. ~~Documento técnico~~ (fuente: `DATA/DOCS/documento_tecnico.md`; PDF: `DATA/DOCS/documento_tecnico.pdf`, 12 páginas, carta, márgenes de 2.2 cm, Arial 11 e interlineado 1.5 también en tablas). El PDF se genera fuera del repositorio, no se versiona (`DATA/DOCS/*.pdf` está en `.gitignore`) y debe regenerarse si cambia el .md
 6. ~~Presentación ejecutiva~~ (completado: `DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
-7. Cartas firmadas (cesión de derechos + declaratoria) — pendiente (requiere firma del equipo)
+7. ~~Cartas firmadas~~ (completado: `CARTAS FIRMADAS/`, cesión de derechos y declaratoria)
 
 ### Criterios de redacción de los entregables
 - Audiencia: personal del INE que conoce a fondo los datos electorales pero no necesariamente métodos de agrupamiento. Lenguaje electoral experto, estadística traducida.
@@ -426,17 +426,17 @@ Ejecutado (~1 min). Visualizaciones de las 6 clases latentes (08) con subperfile
 
 - Nombres definitivos (`NOMBRES`): P0 Por convencer; P1 Constancia que se apaga; P2 Generación en ascenso; P3 Paso firme; P4 Voces que avanzan; P5 Pilar democrático. Se evitaron nombres que estigmatizan o que excluyen a parte del perfil (P4 es 68% mujeres, P2 no es el perfil más joven).
 - Descriptor automático (`DESCRIPTORES`) como subtitulo en fichas, panel del mapa y `fichas_resumen_perfiles.csv`. Conducta (reglas de nivel, brecha y tendencia) más rasgos demográficos solo si destacan frente al nacional (índice = % perfil / % nacional): banda de edad con índice >= 1.4 (`UMBRAL_INDICE`; jóvenes 18-24, adultos jóvenes 25-39, adultos 40-59, mayores 60+), sexo >= 60% (`UMBRAL_SEXO`), rural con índice >= 1.4 y región con índice >= 1.4. Idea de un integrante del equipo; en lugar de "mayoría" se compara contra el nacional porque todos los perfiles son 62-76% urbanos.
-  - P0: Baja participación · jóvenes (18-24) · mayoría hombres · fuerte en el Noroeste
+  - P0: Baja participación · destacan jóvenes (18-24) · mayoría hombres · fuerte en el Noroeste
   - P1: Participación media, estable entre elecciones, en descenso · fuerte en el Occidente
-  - P2: Participación media, se moviliza en presidenciales, en ascenso · jóvenes (18-24)
-  - P3: Participación media-alta, estable entre elecciones · adultos (40-59) · fuerte en el Occidente
+  - P2: Participación media, se moviliza en presidenciales, en ascenso · destacan jóvenes (18-24)
+  - P3: Participación media-alta, estable entre elecciones · destacan adultos (40-59) · fuerte en el Occidente
   - P4: Participación media-alta, se moviliza en presidenciales, en ascenso · mayoría mujeres
-  - P5: Alta participación · mayores (60+) · mayoría mujeres · más rural
+  - P5: Alta participación · destacan mayores (60+) · mayoría mujeres · más rural
 - Cruce municipal por nombre normalizado dentro de cada entidad: 2,354 exactos, 10 por contenido, 7 aproximados (revisables en la sección 6.3), 5 sin cruce (nombres ambiguos de Oaxaca y municipios nuevos de Sinaloa; 54,695 personas). Municipios con menos de 1,000 personas se muestran sin datos: 2,171 de 2,475 con datos.
 - Perfil dominante por municipio: P0 346, P1 38, P2 315, P3 215, P4 307, P5 950.
 - Escolaridad e internet integrados: grado promedio, % posbásica y % viviendas con internet en el resumen y en el bloque "Contexto de la sección" del panel de cada ficha (escolaridad también en el encabezado); gráfica de tramos de escolaridad frente al nacional; columna de escolaridad en la tabla de subperfiles; escolaridad e internet en los popups municipal y estatal, en el panel del mapa y en `fichas_municipios.csv`.
-- Ficha de 16 x 20 pulgadas: trayectoria y métricas; edad, región y escolaridad; entidades sobrerrepresentadas (8) y mapa de presencia; tabla de subperfiles a todo lo ancho.
-- Mapa interactivo: tiles Stadia Maps (`alidade_smooth`); `folium.TileLayer` con `name="Mapa base"` para que el LayerControl muestre un nombre limpio. Capa municipal (opacidad segun % del perfil dominante, popup con composición y subperfil dominante) y estatal. Panel interactivo abajo a la izquierda: cada perfil colapsado (nombre, población, promedio) se expande al hacer click mostrando descriptor, métricas (promedio/brecha/tendencia), trayectoria SVG, género, edad, región y escolaridad como gráficos SVG inline frente al nacional (gris). ~12.6 MB; no se despliega en el notebook.
+- Ficha de 16 x 24.3 pulgadas: banda narrativa e iconográfica (`NARRATIVAS`, `ICONOS`: icono del perfil, quiénes son, cómo votan, cifras clave y estrategia); trayectoria y métricas; edad, región y escolaridad; entidades sobrerrepresentadas (8) y mapa de presencia; tabla de subperfiles a todo lo ancho. Las entidades de la narrativa son las de mayor índice de sobrerrepresentación.
+- Mapa interactivo: tiles CARTO (`light_all`), se abre sin servidor; `folium.TileLayer` con `name="Mapa base"` para que el LayerControl muestre un nombre limpio. Capa municipal (opacidad segun % del perfil dominante, popup con composición y subperfil dominante) y estatal. Panel interactivo abajo a la izquierda: cada perfil colapsado (nombre, población, promedio) se expande al hacer click mostrando descriptor, métricas (promedio/brecha/tendencia), trayectoria SVG, género, edad, región y escolaridad como gráficos SVG inline frente al nacional (gris). ~12.6 MB; no se despliega en el notebook.
 - Salidas en `DATA/PREPROCESSED/fichas/`: `vista_general.png`, `ficha_perfil_{0..5}.png` (200 dpi), `fichas_perfiles.pdf`, `mapa_perfil_dominante.png`, `mapa_clases_latentes.html`, `fichas_resumen_perfiles.csv`, `fichas_municipios.csv`, `fichas_cruce_municipios.csv`.
 - Shapefile `mun22gw` descargado localmente en `DATA/RAW/marco_geoestadistico/` con las funciones de `src/descarga_inicial.py`.
 
@@ -523,7 +523,7 @@ Cuatro scripts standalone que reproducen el pipeline completo desde la descarga 
 4. `visualizacion.py` — Carga y ensambla celdas con pesos, perfiles, subperfiles y ECEG. Genera:
    - `vista_general.png`, `ficha_perfil_{0..5}.png`, `fichas_perfiles.pdf`
    - `mapa_perfil_dominante.png` (estatico)
-   - `mapa_clases_latentes.html` (~12 MB, interactivo con folium y Stadia Maps)
+   - `mapa_clases_latentes.html` (~12 MB, interactivo con folium y CARTO)
    - `fichas_resumen_perfiles.csv`, `fichas_municipios.csv`, `fichas_cruce_municipios.csv`
    - Cruce municipal por nombre normalizado (3 pasos: exacto, contenido, aproximado)
 
@@ -567,5 +567,5 @@ Verificado en clon limpio: `.sh` y notebooks 01-04 y 07-11 dan clases, subperfil
 - [x] Fichas de perfil (`DATA/PREPROCESSED/fichas/`)
 - [x] Presentación ejecutiva (`DATA/DOCS/presentacion_ejecutiva.pptx`, 10 diapositivas)
 - [x] Scripts de produccion (`src/descarga_inicial.py`, `preprocesamiento.py`, `segmentacion.py`, `visualizacion.py`)
-- [ ] Cartas firmadas (requieren la firma del equipo)
+- [x] Cartas firmadas (`CARTAS FIRMADAS/`)
 - [ ] Envío a grecia.castro@ine.mx y cirse.rodriguez@ine.mx (31 oct 2026, 23:59 hrs)
