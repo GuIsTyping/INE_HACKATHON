@@ -6,7 +6,7 @@
 - `documento_tecnico.md` y `estrategias_por_perfil.md`, comparados con los indices de sobrerrepresentacion y las trayectorias: P0 sin Sonora (indice 124, lugar 13); P1 suma Sonora (397) y Nuevo Leon (313); P3 sin Michoacan (76, subrepresentado) y con Colima, Jalisco y Nuevo Leon; P4 ya no dice que crece en cada eleccion (baja en intermedias); P1 "unico perfil con una caida clara" (P3 tiene -0.1) y 43% mujeres (dato 43.49, decia 44); conclusion: P0, P2 y P4 como los perfiles mas urbanos
 - "62% rural" y "57% rural" de los subperfiles 5.5 y 3.5 pasan a "rurales o mixtas", que es lo que mide la columna
 - `documento_tecnico.pdf` regenerado desde el .md. Proyecto (Mosaico Democratico) y equipo (Buhos_MCD), los de las cartas firmadas, en documento, estrategias, README y pie de las fichas
-- `src/visualizacion.py`: mapa base CARTO, igual que el notebook 11. Stadia responde 401 sin servidor local; README actualizado
+- Mapa interactivo con Stadia en `src/visualizacion.py` y notebook 11 (el notebook usaba CARTO, que devuelve tiles con la marca "API KEY REQUIRED"). Stadia no pide API key desde un servidor local y responde 401 como archivo; README con aviso: el HTML solo es de prueba y la experiencia completa es corriendo el proyecto. `preview.html` (no versionado): demo rapido, copia del mapa sin mapa base y con aviso, para el .zip de entrega
 - `presentacion_ejecutiva.pptx`: proyecto y equipo en la portada; P1 con 57% hombres (dato 56.51) y "unico perfil con una caida clara"; territorios de P1 y P3 como en el documento; fichas con resumen narrativo e iconografico; mapa "con internet"; sin el "(I)" que quedaba en el titulo de estrategias
 
 ### Fichas con resumen narrativo e iconografico

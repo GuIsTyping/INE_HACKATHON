@@ -436,7 +436,7 @@ Ejecutado (~1 min). Visualizaciones de las 6 clases latentes (08) con subperfile
 - Perfil dominante por municipio: P0 346, P1 38, P2 315, P3 215, P4 307, P5 950.
 - Escolaridad e internet integrados: grado promedio, % posbásica y % viviendas con internet en el resumen y en el bloque "Contexto de la sección" del panel de cada ficha (escolaridad también en el encabezado); gráfica de tramos de escolaridad frente al nacional; columna de escolaridad en la tabla de subperfiles; escolaridad e internet en los popups municipal y estatal, en el panel del mapa y en `fichas_municipios.csv`.
 - Ficha de 16 x 24.3 pulgadas: banda narrativa e iconográfica (`NARRATIVAS`, `ICONOS`: icono del perfil, quiénes son, cómo votan, cifras clave y estrategia); trayectoria y métricas; edad, región y escolaridad; entidades sobrerrepresentadas (8) y mapa de presencia; tabla de subperfiles a todo lo ancho. Las entidades de la narrativa son las de mayor índice de sobrerrepresentación.
-- Mapa interactivo: tiles CARTO (`light_all`), se abre sin servidor; `folium.TileLayer` con `name="Mapa base"` para que el LayerControl muestre un nombre limpio. Capa municipal (opacidad segun % del perfil dominante, popup con composición y subperfil dominante) y estatal. Panel interactivo abajo a la izquierda: cada perfil colapsado (nombre, población, promedio) se expande al hacer click mostrando descriptor, métricas (promedio/brecha/tendencia), trayectoria SVG, género, edad, región y escolaridad como gráficos SVG inline frente al nacional (gris). ~12.6 MB; no se despliega en el notebook.
+- Mapa interactivo: tiles Stadia Maps (`alidade_smooth`); sin API key desde un servidor local, 401 si se abre como archivo (aviso en el README); `folium.TileLayer` con `name="Mapa base"` para que el LayerControl muestre un nombre limpio. Capa municipal (opacidad segun % del perfil dominante, popup con composición y subperfil dominante) y estatal. Panel interactivo abajo a la izquierda: cada perfil colapsado (nombre, población, promedio) se expande al hacer click mostrando descriptor, métricas (promedio/brecha/tendencia), trayectoria SVG, género, edad, región y escolaridad como gráficos SVG inline frente al nacional (gris). ~12.6 MB; no se despliega en el notebook.
 - Salidas en `DATA/PREPROCESSED/fichas/`: `vista_general.png`, `ficha_perfil_{0..5}.png` (200 dpi), `fichas_perfiles.pdf`, `mapa_perfil_dominante.png`, `mapa_clases_latentes.html`, `fichas_resumen_perfiles.csv`, `fichas_municipios.csv`, `fichas_cruce_municipios.csv`.
 - Shapefile `mun22gw` descargado localmente en `DATA/RAW/marco_geoestadistico/` con las funciones de `src/descarga_inicial.py`.
 
@@ -523,7 +523,7 @@ Cuatro scripts standalone que reproducen el pipeline completo desde la descarga 
 4. `visualizacion.py` — Carga y ensambla celdas con pesos, perfiles, subperfiles y ECEG. Genera:
    - `vista_general.png`, `ficha_perfil_{0..5}.png`, `fichas_perfiles.pdf`
    - `mapa_perfil_dominante.png` (estatico)
-   - `mapa_clases_latentes.html` (~12 MB, interactivo con folium y CARTO)
+   - `mapa_clases_latentes.html` (~12 MB, interactivo con folium y Stadia Maps)
    - `fichas_resumen_perfiles.csv`, `fichas_municipios.csv`, `fichas_cruce_municipios.csv`
    - Cruce municipal por nombre normalizado (3 pasos: exacto, contenido, aproximado)
 

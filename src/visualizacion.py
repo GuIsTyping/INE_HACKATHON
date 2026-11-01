@@ -18,7 +18,7 @@ Salida:  DATA/PREPROCESSED/fichas/
     ficha_perfil_{0..5}.png (200 dpi)
     fichas_perfiles.pdf
     mapa_perfil_dominante.png
-    mapa_clases_latentes.html (~13 MB)
+    mapa_clases_latentes.html (~12 MB, requiere servirse desde HTTP)
     fichas_resumen_perfiles.csv
     fichas_municipios.csv
     fichas_cruce_municipios.csv
@@ -1055,13 +1055,14 @@ def generar_mapa_interactivo(gmun, gedo, celdas, res_perfil, tray_perfil, nac_tr
         dist_esc[p] = (con.groupby("tramo_esc")["peso"].sum()
                        .reindex(TRAMOS_ESC, fill_value=0) / wc * 100).tolist()
 
-    # Mapa base con tiles CARTO (sin API key; funcionan al abrir el archivo sin servidor)
+    # Mapa base con tiles Stadia Maps (funcionan desde localhost sin API key)
     m = folium.Map(location=[23.6, -102.5], zoom_start=5, tiles=None)
     folium.TileLayer(
-        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        tiles="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
         attr=(
-            "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> "
-            "&copy; <a href='https://carto.com/attributions'>CARTO</a>"
+            "&copy; <a href='https://stadiamaps.com/'>Stadia Maps</a> "
+            "&copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> "
+            "&copy; <a href='https://www.openstreetmap.org/copyright'>OSM</a>"
         ),
         name="Mapa base",
     ).add_to(m)

@@ -77,7 +77,18 @@ Ejecuta las celdas en orden. Además de descargar y extraer, consolida los CSVs 
 
 ## Mapa interactivo
 
-`ejecutar_pipeline.sh` y el notebook 11 generan un mapa interactivo en `DATA/PREPROCESSED/fichas/mapa_clases_latentes.html`. Se abre directamente en el navegador; necesita internet para cargar el mapa base (CARTO) y las bibliotecas.
+`ejecutar_pipeline.sh` y el notebook 11 generan un mapa interactivo en `DATA/PREPROCESSED/fichas/mapa_clases_latentes.html`. Los tiles del mapa (Stadia Maps) requieren servirse desde un servidor HTTP, no se pueden abrir directamente como archivo local.
+
+> **Aviso:** el archivo `mapa_clases_latentes.html` abierto por sí solo es una versión de prueba: los datos se ven, pero el mapa base muestra un error de autenticación (401). Para la experiencia completa hay que correr el proyecto con `./ejecutar_pipeline.sh`, que no requiere API key. El .zip de entrega incluye `preview.html`, un demo rápido sin mapa base que se abre sin servidor y sin ese error.
+
+Si ya se ejecutó el proyecto, para visualizar el mapa:
+
+```bash
+cd DATA/PREPROCESSED/fichas
+python -m http.server 8765
+```
+
+Luego abrir en el navegador: `http://localhost:8765/mapa_clases_latentes.html`
 
 El mapa incluye capas municipal y estatal con el perfil dominante por territorio, popups con detalles y un panel lateral con los 6 perfiles.
 
